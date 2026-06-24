@@ -1,6 +1,6 @@
 {
   "name": "clearfeed",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "private": true,
   "description": "Chrome extension that mutes topics you'd rather not see — politics, gossip, spoilers or any keywords — from news feeds.",
   "scripts": {

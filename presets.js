@@ -54,6 +54,22 @@ const PRESET_CONTENT = {
     money:     { name: "Argent & crypto", words: ["bitcoin", "crypto", "bourse", "inflation", "récession", "nasdaq", "licenciement", "ethereum"] },
     spoilers:  { name: "Spoilers", words: ["spoiler", "fin de saison", "épisode", "bande-annonce", "sortie", "box-office", "fin expliquée"] },
   },
+  cs: {
+    sports:    { name: "Sport", words: ["fotbal", "hokej", "tenis", "basketbal", "olympi", "liga", "gól", "zápas", "reprezentace", "mistrovství"] },
+    politics:  { name: "Politika", words: ["volb", "parlament", "senát", "prezident", "vláda", "ministr", "referend", "poslanec", "koalice", "sněmovna"] },
+    celebrity: { name: "Celebrity a drby", words: ["celebrit", "drby", "bulvár", "influencer", "paparazzi", "rozchod", "královská rodina"] },
+    crime:     { name: "Krimi a katastrofy", words: ["vražd", "střelb", "vrah", "terorism", "únos", "požár", "zemětřesení", "hurikán", "katastrof", "oběť"] },
+    money:     { name: "Peníze a krypto", words: ["bitcoin", "krypto", "burza", "inflace", "recese", "akcie", "úrok", "ethereum"] },
+    spoilers:  { name: "Spoilery", words: ["spoiler", "finále série", "epizoda", "trailer", "premiéra", "upoutávka"] },
+  },
+  pl: {
+    sports:    { name: "Sport", words: ["piłka nożna", "koszykówka", "tenis", "hokej", "olimpi", "liga", "gol", "mecz", "mistrzostwa", "reprezentacja"] },
+    politics:  { name: "Polityka", words: ["wybor", "parlament", "senat", "prezydent", "rząd", "minister", "referendum", "poseł", "koalicja", "sejm"] },
+    celebrity: { name: "Celebryci i plotki", words: ["celebryt", "plotki", "tabloid", "influencer", "paparazzi", "rozstanie", "rodzina królewska"] },
+    crime:     { name: "Przestępstwa i katastrofy", words: ["morderstwo", "strzelanin", "zabójstwo", "terror", "porwanie", "pożar", "trzęsienie ziemi", "huragan", "katastrof", "ofiar"] },
+    money:     { name: "Pieniądze i krypto", words: ["bitcoin", "krypto", "giełda", "inflacja", "recesja", "akcje", "stopa procentowa"] },
+    spoilers:  { name: "Spoilery", words: ["spoiler", "finał sezonu", "odcinek", "zwiastun", "premiera", "box office"] },
+  },
 };
 
 // Return the preset list for a language, merging metadata + localized content.

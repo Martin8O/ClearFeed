@@ -13,7 +13,7 @@
 
 - **Pick your topics.** Start from one-click **suggested topics** (Politics, Celebrity gossip, Crime & disasters, Money & crypto, Spoilers, Sports) or add your own — each comes with a ready-made keyword list.
 - **Fully editable.** Every topic is just an editable keyword list. A word *stem* is enough: `elect` catches *election*, *elections*, *electoral*…
-- **Multi-language.** Switch the app language and seeded word lists between **English, Español, Deutsch and Français** — so filtering works on your local news too.
+- **Multi-language.** Switch the app language and seeded word lists between **English, Español, Deutsch, Français, Čeština and Polski** — so filtering works on your local news too.
 - **Per-topic on/off** toggles, plus a master switch to pause everything.
 - **Excluded sites.** Add domains (banking, e-mail, …) where filtering should never run — one click excludes the site you're on.
 - **Reveal hidden items** — one click temporarily shows what was hidden on the page (outlined), then re-hides it, so nothing happens behind your back.

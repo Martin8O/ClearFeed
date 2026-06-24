@@ -3,6 +3,14 @@
 All notable changes to ClearFeed are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.3] - 2026-06-24
+
+### Added
+- **Czech (Čeština)** and **Polish (Polski)** — full UI translations plus localized
+  suggested-topic word lists. ClearFeed now ships in 6 languages.
+- About panel now states plainly: "ClearFeed collects nothing, sends nothing, and talks to no
+  server. Everything stays on your device," with a small "Free & open source" line.
+
 ## [2.2] - 2026-06-24
 
 ### Fixed

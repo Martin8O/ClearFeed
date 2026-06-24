@@ -20,7 +20,7 @@ Mute topics you'd rather not see — politics, gossip, spoilers, sports or any k
 ```
 
 **Category:** Productivity
-**Language:** English (UI also available in Español, Deutsch, Français)
+**Language:** English (UI also available in Español, Deutsch, Français, Čeština, Polski)
 
 **Detailed description**
 
@@ -36,8 +36,8 @@ from any keywords. Every topic is fully editable, and a word stem is enough: "el
 election, elections, electoral…
 
 ★ WORKS IN YOUR LANGUAGE
-Switch the app and its suggested word lists between English, Español, Deutsch and Français,
-so filtering works on your local news too.
+Switch the app and its suggested word lists between English, Español, Deutsch, Français,
+Čeština and Polski, so filtering works on your local news too.
 
 ★ YOU STAY IN CONTROL
 • Per-topic and master on/off switches.

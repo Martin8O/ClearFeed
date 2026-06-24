@@ -89,12 +89,12 @@ test("i18n: t falls back to English, fmt fills placeholders", () => {
   assert.equal(popup.t("xx", "save"), "Save");       // unknown language -> English
   assert.equal(popup.t("en", "___nope"), "___nope"); // unknown key -> key itself
   assert.equal(popup.fmt("Delete {name}?", { name: "Sports" }), "Delete Sports?");
-  assert.deepEqual(Array.from(popup.uiLangCodes()), ["en", "es", "de", "fr"]);
+  assert.deepEqual(Array.from(popup.uiLangCodes()), ["en", "es", "de", "fr", "cs", "pl"]);
 });
 
 test("presets: each language exposes the same topics with non-empty words", () => {
   const langs = Array.from(popup.presetLangCodes());
-  assert.deepEqual(langs, ["en", "es", "de", "fr"]);
+  assert.deepEqual(langs, ["en", "es", "de", "fr", "cs", "pl"]);
   const baseIds = Array.from(popup.getPresets("en").map((p) => p.id)).sort();
   for (const l of langs) {
     const ps = popup.getPresets(l);
@@ -117,6 +117,10 @@ test("presetBaseId extracts the topic id (incl. legacy _xx suffix)", () => {
 test("localized preset words actually match local-language content", () => {
   const esPolitics = popup.getPresets("es").find((p) => p.id === "politics");
   const deSports = popup.getPresets("de").find((p) => p.id === "sports");
+  const csSports = popup.getPresets("cs").find((p) => p.id === "sports");
+  const plPolitics = popup.getPresets("pl").find((p) => p.id === "politics");
   assert.equal(blocks("Resultados de las elecciones municipales", [{ enabled: true, words: esPolitics.words }]), true);
   assert.equal(blocks("Bundesliga: Tor in der Nachspielzeit", [{ enabled: true, words: deSports.words }]), true);
+  assert.equal(blocks("Sledujte dnešní fotbalový zápas", [{ enabled: true, words: csSports.words }]), true);
+  assert.equal(blocks("Wyniki wyborów parlamentarnych", [{ enabled: true, words: plPolitics.words }]), true);
 });

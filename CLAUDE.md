@@ -8,7 +8,7 @@ Guidance for Claude Code (and other AI assistants) working in this repository.
 hides unwanted content from news sites and feeds. It blocks elements whose text matches
 words from user-defined **topics** (categories). On first run nothing is filtered — the user
 adds topics from a built-in **suggested-topic library** (or their own). The UI and the seeded
-word lists are localized (EN/ES/DE/FR) with a runtime language switcher.
+word lists are localized (EN/ES/DE/FR/CS/PL) with a runtime language switcher.
 
 There is no framework, bundler, or package manager — the files are loaded directly by
 Chrome as an unpacked extension. Edit the source files and reload the extension to test.
@@ -41,7 +41,8 @@ Two execution contexts that communicate through `chrome.storage.local` and runti
 - `categories` — array of `{ id, name, enabled, color, words[] }`. Empty on first run.
   Added from presets (id `preset_<topic>_<lang>`) or custom (`cat_<ts>`).
 - `excludedSites` — array of domains where scanning never runs (matches subdomains too).
-- `uiLang` — selected app language (`en`/`es`/`de`/`fr`); defaults from `navigator.language`.
+- `uiLang` — selected app language (`en`/`es`/`de`/`fr`/`cs`/`pl`); defaults from `navigator.language`.
+- `theme` — `light`/`dark`; defaults from `prefers-color-scheme`.
 - `blockedTotal` — running count of hidden elements.
 
 `DEFAULT_CATEGORIES` (now `[]`) exists in both `content.js` and `popup.js` — keep in sync.
