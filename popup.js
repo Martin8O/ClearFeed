@@ -10,6 +10,9 @@ const COLORS = ["#e74c3c","#e67e22","#f39c12","#27ae60","#2980b9","#8e44ad","#16
 const REPO_URL = "https://github.com/Martin8O/ClearFeed";
 const COFFEE_URL = ""; // TODO: paste your "Buy Me a Coffee" URL here to enable the button.
 
+// Preset category ids look like "preset_<topic>"; the "_xx" language suffix is legacy.
+const PRESET_LANG_SUFFIX = /_(en|es|de|fr)$/;
+
 let state = { enabled: true, blockedTotal: 0, categories: [], excludedSites: [], uiLang: "en", theme: "light" };
 
 // --- Init ---
@@ -42,7 +45,6 @@ function pickTheme(stored) {
 
 function setVersion() {
   const v = "v" + (chrome.runtime.getManifest ? chrome.runtime.getManifest().version : "");
-  document.getElementById("version").textContent = v;
   document.getElementById("aboutVer").textContent = v;
 }
 
@@ -107,6 +109,7 @@ function buildLangOptions() {
 
 document.getElementById("langSelect").addEventListener("change", (e) => {
   state.uiLang = e.target.value;
+  const changed = relocalizeCategories(state.uiLang); // keep added topics in one language
   saveSettings();
   applyI18n();
   setMasterToggle(state.enabled);     // refresh localized label
@@ -114,6 +117,7 @@ document.getElementById("langSelect").addEventListener("change", (e) => {
   renderPresets();
   renderExcluded();
   refreshRevealButton();
+  if (changed) broadcastReload();
 });
 
 // --- Master toggle ---
@@ -159,11 +163,19 @@ document.getElementById("newCatName").addEventListener("keydown", (e) => {
 });
 
 // --- Suggested topic presets ---
+// Preset categories use a language-independent id ("preset_<topic>"); the
+// display name + words follow the current UI language and are re-localized when
+// the language changes.
+function presetBaseId(catId) {
+  if (typeof catId !== "string" || catId.indexOf("preset_") !== 0) return null;
+  return catId.slice(7).replace(PRESET_LANG_SUFFIX, "");
+}
+
 function renderPresets() {
   const list = document.getElementById("presetList");
   list.innerHTML = "";
-  const have = new Set(state.categories.map((c) => c.id));
-  const available = getPresets(state.uiLang).filter((p) => !have.has(presetCatId(p.id)));
+  const have = new Set(state.categories.map((c) => presetBaseId(c.id)).filter(Boolean));
+  const available = getPresets(state.uiLang).filter((p) => !have.has(p.id));
 
   if (available.length === 0) {
     list.innerHTML = `<div class="preset-empty">${esc(tr("added"))} ✓</div>`;
@@ -172,19 +184,17 @@ function renderPresets() {
   available.forEach((p) => {
     const chip = document.createElement("button");
     chip.className = "preset-chip";
-    chip.innerHTML = `<span class="pdot" style="background:${p.color}"></span>${esc(p.icon)} ${esc(p.name)} <span class="pplus">+</span>`;
+    chip.innerHTML = `<span class="pdot" style="background:${p.color}"></span>` +
+      `<span class="picon">${esc(p.icon)}</span>` +
+      `<span class="pname">${esc(p.name)}</span><span class="pplus">+</span>`;
     chip.addEventListener("click", () => addPreset(p));
     list.appendChild(chip);
   });
 }
 
-function presetCatId(presetId) {
-  return `preset_${presetId}_${state.uiLang}`;
-}
-
 function addPreset(p) {
   state.categories.push({
-    id: presetCatId(p.id),
+    id: "preset_" + p.id,
     name: p.name,
     enabled: true,
     color: p.color,
@@ -194,6 +204,24 @@ function addPreset(p) {
   renderCategories();
   renderPresets();
   broadcastReload();
+}
+
+// Re-localize preset categories to a language (name + words). Custom categories
+// are left untouched. Returns true if anything changed.
+function relocalizeCategories(lang) {
+  const byId = {};
+  getPresets(lang).forEach((p) => { byId[p.id] = p; });
+  let changed = false;
+  state.categories = state.categories.map((c) => {
+    const base = presetBaseId(c.id);
+    if (base && byId[base]) {
+      const p = byId[base];
+      changed = true;
+      return { id: "preset_" + base, name: p.name, color: p.color, enabled: c.enabled !== false, words: p.words.slice() };
+    }
+    return c;
+  });
+  return changed;
 }
 
 // --- Excluded sites ---

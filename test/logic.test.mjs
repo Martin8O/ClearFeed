@@ -106,6 +106,14 @@ test("presets: each language exposes the same topics with non-empty words", () =
   }
 });
 
+test("presetBaseId extracts the topic id (incl. legacy _xx suffix)", () => {
+  assert.equal(popup.presetBaseId("preset_politics"), "politics");
+  assert.equal(popup.presetBaseId("preset_politics_en"), "politics"); // legacy id
+  assert.equal(popup.presetBaseId("preset_celebrity_de"), "celebrity");
+  assert.equal(popup.presetBaseId("cat_1700000000000"), null);
+  assert.equal(popup.presetBaseId(null), null);
+});
+
 test("localized preset words actually match local-language content", () => {
   const esPolitics = popup.getPresets("es").find((p) => p.id === "politics");
   const deSports = popup.getPresets("de").find((p) => p.id === "sports");

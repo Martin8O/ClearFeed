@@ -3,6 +3,21 @@
 All notable changes to ClearFeed are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.2] - 2026-06-24
+
+### Fixed
+- Switching the app language now **re-localizes already-added suggested topics** (name and
+  words) so everything stays in one language. Previously a topic added in one language kept
+  that language after switching. (Editing a topic's words and then switching language re-seeds
+  them for the new language.)
+
+### Changed
+- **Narrower popup** and a tidier layout.
+- **Suggested topics are now a vertical list** of full-width rows (easier to scan) instead of
+  wrapped chips.
+- **Slimmer, sticky footer** that stays visible while scrolling; clearer About (info icon) and
+  a labeled "Buy me a coffee" button.
+
 ## [2.1] - 2026-06-24
 
 ### Added
