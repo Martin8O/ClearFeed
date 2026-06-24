@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      width: 320px;
+      background: #f8f8f8;
+      color: #1a1a1a;
+      font-size: 13px;
+    }
+
+    .header {
+      background: #1a1a2e;
+      color: #fff;
+      padding: 14px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .header-left h1 { font-size: 14px; font-weight: 600; }
+    .header-left p  { font-size: 11px; color: #9a9ab0; margin-top: 1px; }
+
+    .stat-bar {
+      background: #fff; border-bottom: 1px solid #eee;
+      padding: 9px 16px; display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: #555;
+    }
+    .stat-bar strong { font-size: 18px; font-weight: 700; color: #1a1a2e; }
+    .stat-bar .reset {
+      margin-left: auto; font-size: 11px; color: #aaa; cursor: pointer;
+      background: none; border: none; padding: 2px 4px;
+    }
+    .stat-bar .reset:hover { color: #e74c3c; }
+
+    .master-row {
+      background: #fff; border-bottom: 1px solid #eee; padding: 10px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .master-label { font-weight: 500; font-size: 13px; }
+    .master-label.off { color: #aaa; }
+
+    .section-header {
+      padding: 10px 16px 6px; font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.8px; color: #999;
+    }
+
+    .cat-list { padding: 0 10px 6px; }
+    .cat-card {
+      background: #fff; border-radius: 8px; margin-bottom: 6px;
+      border: 1px solid #e8e8e8; overflow: hidden; transition: box-shadow .15s;
+    }
+    .cat-card:hover { box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+    .cat-header {
+      display: flex; align-items: center; padding: 10px 12px; gap: 8px;
+      cursor: pointer; user-select: none;
+    }
+    .cat-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .cat-name { flex: 1; font-weight: 500; font-size: 13px; }
+    .cat-count { font-size: 11px; color: #aaa; margin-right: 4px; }
+    .cat-chevron {
+      font-size: 10px; color: #bbb; transition: transform .2s; margin-right: 6px;
+    }
+    .cat-card.open .cat-chevron { transform: rotate(180deg); }
+    .cat-body {
+      display: none; border-top: 1px solid #f0f0f0; padding: 10px 12px; background: #fafafa;
+    }
+    .cat-card.open .cat-body { display: block; }
+    .words-area {
+      width: 100%; height: 80px; border: 1px solid #ddd; border-radius: 6px;
+      padding: 7px 9px; font-size: 12px; font-family: inherit; resize: vertical;
+      background: #fff; color: #333; line-height: 1.5; outline: none;
+    }
+    .words-area:focus { border-color: #7c83fd; }
+    .words-hint { font-size: 10px; color: #aaa; margin-top: 4px; line-height: 1.4; }
+    .cat-actions { display: flex; justify-content: space-between; margin-top: 8px; }
+    .btn-save {
+      background: #1a1a2e; color: #fff; border: none; border-radius: 5px;
+      padding: 5px 12px; font-size: 12px; cursor: pointer;
+    }
+    .btn-save:hover { background: #2d2d4e; }
+    .btn-delete {
+      background: none; border: 1px solid #f0f0f0; border-radius: 5px;
+      padding: 5px 10px; font-size: 12px; color: #e74c3c; cursor: pointer;
+    }
+    .btn-delete:hover { background: #fff0f0; }
+
+    .add-section { padding: 4px 10px 12px; }
+    .add-row { display: flex; gap: 6px; }
+    .add-name-input {
+      flex: 1; border: 1px solid #ddd; border-radius: 6px; padding: 7px 10px;
+      font-size: 12px; font-family: inherit; outline: none; background: #fff;
+    }
+    .add-name-input:focus { border-color: #7c83fd; }
+    .btn-add {
+      background: #2ecc71; color: #fff; border: none; border-radius: 6px;
+      padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;
+    }
+    .btn-add:hover { background: #27ae60; }
+
+    /* === EXCLUDED SITES === */
+    .excl-section { padding: 0 10px 14px; }
+    .btn-excl-current {
+      width: 100%; background: #fff; border: 1px dashed #c9c9d6; border-radius: 8px;
+      padding: 9px; font-size: 12px; font-weight: 500; color: #4a4a6a;
+      cursor: pointer; margin-bottom: 8px; transition: background .15s;
+    }
+    .btn-excl-current:hover { background: #f0f0fa; border-color: #7c83fd; color: #1a1a2e; }
+    .excl-list { display: flex; flex-direction: column; gap: 5px; }
+    .excl-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #fff; border: 1px solid #e8e8e8; border-radius: 6px;
+      padding: 7px 10px;
+    }
+    .excl-domain { font-size: 12px; color: #333; word-break: break-all; }
+    .excl-remove {
+      background: none; border: none; color: #bbb; cursor: pointer;
+      font-size: 14px; line-height: 1; padding: 0 2px; flex-shrink: 0;
+    }
+    .excl-remove:hover { color: #e74c3c; }
+    .excl-empty { font-size: 11px; color: #aaa; font-style: italic; padding: 2px 2px 6px; }
+
+    /* TOGGLE */
+    .switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; inset: 0; background: #ccc; border-radius: 22px;
+      transition: .2s; cursor: pointer;
+    }
+    .slider::before {
+      content: ""; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px;
+      background: #fff; border-radius: 50%; transition: .2s;
+    }
+    input:checked + .slider { background: #2ecc71; }
+    input:checked + .slider::before { transform: translateX(18px); }
+
+    .saved-flash { font-size: 11px; color: #2ecc71; margin-left: 6px; opacity: 0; transition: opacity .3s; }
+    .saved-flash.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>⛔ ClearFeed</h1>
+    <p>Hide articles by category</p>
+  </div>
+</div>
+
+<div class="stat-bar">
+  <strong id="count">0</strong>
+  articles hidden
+  <button class="reset" id="resetBtn" title="Reset counter">↺ reset</button>
+</div>
+
+<div class="master-row">
+  <span class="master-label" id="masterLabel">Blocking active</span>
+  <label class="switch">
+    <input type="checkbox" id="masterToggle"/>
+    <span class="slider"></span>
+  </label>
+</div>
+
+<div class="section-header">Categories</div>
+<div class="cat-list" id="catList"></div>
+
+<div class="section-header">Add category</div>
+<div class="add-section">
+  <div class="add-row">
+    <input type="text" class="add-name-input" id="newCatName" placeholder="Category name…" maxlength="30"/>
+    <button class="btn-add" id="addCatBtn">+ Add</button>
+  </div>
+</div>
+
+<div class="section-header">Excluded sites — never blocked here</div>
+<div class="excl-section">
+  <button class="btn-excl-current" id="exclCurrentBtn">＋ Exclude the site I'm currently on</button>
+  <div class="excl-list" id="exclList"></div>
+  <div class="add-row" style="margin-top:7px">
+    <input type="text" class="add-name-input" id="newExclDomain" placeholder="e.g. mybank.com" maxlength="80"/>
+    <button class="btn-add" id="addExclBtn">+ Add</button>
+  </div>
+</div>
+
+<script src="words.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>
