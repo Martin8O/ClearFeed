@@ -1,0 +1,16 @@
+# Normalize line endings
+* text=auto
+
+# Keep the Chrome Web Store package lean: `git archive` ships runtime files only.
+/test/ export-ignore
+/.github/ export-ignore
+/store/ export-ignore
+/assets/ export-ignore
+package.json export-ignore
+CLAUDE.md export-ignore
+README.md export-ignore
+PRIVACY.md export-ignore
+SECURITY.md export-ignore
+CHANGELOG.md export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore

@@ -3,6 +3,8 @@
   "name": "ClearFeed",
   "version": "1.4",
   "description": "Hide sports content — or any words you choose — from news sites and feeds.",
+  "author": "Martin Svoboda",
+  "homepage_url": "https://github.com/Martin8O/ClearFeed",
   "permissions": [
     "storage",
     "activeTab"

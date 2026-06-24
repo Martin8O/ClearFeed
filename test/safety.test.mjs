@@ -9,8 +9,11 @@ import url from "node:url";
 
 const ROOT = path.dirname(path.dirname(url.fileURLToPath(import.meta.url)));
 
-// Files actually shipped to users (everything Chrome loads). Tests/docs excluded.
-const SHIPPED = ["manifest.json", "content.js", "popup.js", "words.js", "popup.html"];
+// Executable code shipped to users. The forbidden-pattern scan targets these,
+// because that's where a network call or remote-code execution could live.
+// manifest.json is metadata (its homepage_url is benign) and is checked
+// separately for permission scope below.
+const CODE_FILES = ["content.js", "popup.js", "words.js", "popup.html"];
 
 // Each forbidden pattern => human-readable reason.
 const FORBIDDEN = [
@@ -40,7 +43,7 @@ function scan(file) {
   return hits;
 }
 
-for (const file of SHIPPED) {
+for (const file of CODE_FILES) {
   test(`no unsafe patterns in ${file}`, () => {
     const hits = scan(file);
     assert.deepEqual(hits, [], hits.join("\n"));
