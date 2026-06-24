@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ClearFeed",
-  "version": "2.3",
+  "version": "2.4",
   "description": "Clean your feed and focus on what matters. Mute topics you'd rather not see — politics, gossip, spoilers or any keywords.",
   "author": "Martin Svoboda",
   "homepage_url": "https://github.com/Martin8O/ClearFeed",

@@ -12,6 +12,7 @@
       --accent: #6c5cff; --accent-weak: #eef0ff;
       --green: #2ecc71; --danger: #e74c3c; --switch-off: #cfcfd8;
       --field: #ffffff; --shadow: 0 1px 8px rgba(20,20,40,.08);
+      --coffee: #c0860b; --scroll: #d6d6e0;
     }
     [data-theme="dark"] {
       --bg: #14151c; --surface: #1e2029; --surface-2: #191a22;
@@ -21,9 +22,29 @@
       --accent: #8b80ff; --accent-weak: #23243a;
       --green: #2ecc71; --danger: #ff7070; --switch-off: #3a3c4a;
       --field: #14151c; --shadow: 0 2px 10px rgba(0,0,0,.45);
+      --coffee: #e6b53c; --scroll: #3a3c4a;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Avoid the theme "flash": keep the popup hidden until the stored theme is
+       applied (added as .cf-ready in popup.js), so the light→dark switch never
+       paints. Transitions are likewise gated so the first paint is instant and
+       only later user toggles animate. */
+    html { visibility: hidden; }
+    html.cf-ready { visibility: visible; }
+
+    /* Discreet, theme-matched scrollbars (main view + About overlay), so the
+       chunky bright OS scrollbar doesn't glow in dark mode. */
+    html, .about-overlay { scrollbar-width: thin; scrollbar-color: var(--scroll) transparent; }
+    html::-webkit-scrollbar, .about-overlay::-webkit-scrollbar { width: 9px; }
+    html::-webkit-scrollbar-track, .about-overlay::-webkit-scrollbar-track { background: transparent; }
+    html::-webkit-scrollbar-thumb, .about-overlay::-webkit-scrollbar-thumb {
+      background: var(--scroll); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box;
+    }
+    html::-webkit-scrollbar-thumb:hover, .about-overlay::-webkit-scrollbar-thumb:hover {
+      background: var(--faint); background-clip: padding-box;
+    }
 
     body {
       font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -31,8 +52,8 @@
       background: var(--bg);
       color: var(--text);
       font-size: 13px;
-      transition: background .2s, color .2s;
     }
+    html.cf-ready body { transition: background .2s, color .2s; }
 
     .header {
       background: var(--header-bg);
@@ -49,11 +70,43 @@
       display: inline-flex; align-items: center; justify-content: center; transition: background .15s;
     }
     .icon-btn:hover { background: rgba(255,255,255,.22); }
-    .lang-select {
+    /* Language dropdown (custom, so it can show SVG flags) */
+    .lang-dd { position: relative; }
+    .lang-trigger {
+      display: inline-flex; align-items: center; gap: 6px;
       background: rgba(255,255,255,.12); color: #fff; border: none; border-radius: 8px;
-      font-size: 11px; padding: 5px 6px; cursor: pointer; outline: none; max-width: 96px;
+      font-size: 11px; padding: 5px 8px; cursor: pointer; outline: none; transition: background .15s;
     }
-    .lang-select option { color: #1b1b24; }
+    .lang-trigger:hover { background: rgba(255,255,255,.22); }
+    .lang-trigger .caret { font-size: 8px; opacity: .75; }
+    .lang-menu {
+      position: absolute; top: calc(100% + 6px); right: 0; z-index: 60; margin: 0;
+      list-style: none; padding: 4px; min-width: 124px; max-height: 256px; overflow-y: auto;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px; box-shadow: var(--shadow);
+      scrollbar-width: thin; scrollbar-color: var(--scroll) transparent;
+    }
+    .lang-menu::-webkit-scrollbar { width: 8px; }
+    .lang-menu::-webkit-scrollbar-track { background: transparent; }
+    .lang-menu::-webkit-scrollbar-thumb {
+      background: var(--scroll); border-radius: 8px;
+      border: 2px solid transparent; background-clip: padding-box;
+    }
+    .lang-menu::-webkit-scrollbar-thumb:hover { background: var(--faint); background-clip: padding-box; }
+    .lang-menu[hidden] { display: none; }
+    .lang-opt {
+      display: flex; align-items: center; gap: 9px; width: 100%; text-align: left;
+      padding: 7px 9px; border: none; border-radius: 7px; background: none; cursor: pointer;
+      color: var(--text); font-size: 12px; white-space: nowrap;
+    }
+    .lang-opt:hover { background: var(--hover); }
+    .lang-opt.sel { background: var(--accent-weak); color: var(--accent); font-weight: 600; }
+
+    /* Shared flag tile */
+    .flag {
+      width: 20px; height: 13px; flex-shrink: 0; border-radius: 3px; overflow: hidden;
+      box-shadow: 0 0 0 1px rgba(0,0,0,.14) inset; display: block;
+    }
+    .flag svg { display: block; width: 100%; height: 100%; }
 
     .stat-bar {
       background: var(--surface); border-bottom: 1px solid var(--border);
@@ -122,6 +175,8 @@
     }
     .preset-chip:hover { border-color: var(--accent); background: var(--accent-weak); }
     .preset-chip .pdot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .preset-chip .picon { display: flex; flex-shrink: 0; }
+    .preset-chip .picon svg { width: 18px; height: 18px; display: block; }
     .preset-chip .pname { flex: 1; font-weight: 500; }
     .preset-chip .pplus { color: var(--green); font-weight: 700; font-size: 16px; line-height: 1; }
     .preset-empty { padding: 0 16px 6px; font-size: 11px; color: var(--faint); font-style: italic; }
@@ -207,10 +262,11 @@
     }
     .foot-btn:hover { color: var(--accent); background: var(--hover); }
     .foot-btn svg { width: 15px; height: 15px; display: block; flex-shrink: 0; }
-    .foot-btn.coffee:hover { color: #b8860b; }
+    .foot-btn.coffee svg { color: var(--coffee); }
+    .foot-btn.coffee:hover svg { filter: brightness(1.08); }
 
     /* ABOUT OVERLAY */
-    .about-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 50; display: flex; flex-direction: column; padding: 16px 18px 20px; }
+    .about-overlay { background: var(--bg); display: flex; flex-direction: column; padding: 16px 18px 20px; min-height: 440px; }
     .about-overlay[hidden] { display: none; }
     .about-close { align-self: flex-end; background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; line-height: 1; }
     .about-icon { width: 66px; height: 66px; border-radius: 16px; margin: 4px auto 12px; display: block; box-shadow: var(--shadow); }
@@ -227,12 +283,13 @@
     }
     .about-link:hover { border-color: var(--accent); background: var(--hover); }
     .about-link svg { width: 18px; height: 18px; }
-    .about-coffee { background: #ffdd00; color: #1a1a1a; border: none; font-weight: 700; }
-    .about-coffee:hover { filter: brightness(.96); background: #ffdd00; }
+    .about-coffee svg { color: var(--coffee); }
+    .about-coffee:hover svg { filter: brightness(1.08); }
   </style>
 </head>
 <body>
 
+<div id="mainView">
 <div class="header">
   <div class="header-left">
     <h1>ClearFeed</h1>
@@ -240,7 +297,10 @@
   </div>
   <div class="header-right">
     <button class="icon-btn" id="themeBtn" title="Theme">🌙</button>
-    <select class="lang-select" id="langSelect" title="Language"></select>
+    <div class="lang-dd" id="langDd">
+      <button class="lang-trigger" id="langTrigger" type="button" title="Language" aria-haspopup="listbox" aria-expanded="false"></button>
+      <ul class="lang-menu" id="langMenu" role="listbox" hidden></ul>
+    </div>
   </div>
 </div>
 
@@ -312,14 +372,16 @@
     <span data-i18n="coffee">Buy me a coffee</span>
   </button>
 </div>
+</div><!-- /mainView -->
 
-<!-- About overlay -->
+<!-- About panel (replaces the main view; not an overlay, so the window never scrolls behind it) -->
 <div class="about-overlay" id="aboutPanel" hidden>
   <button class="about-close" id="aboutClose" title="Close">✕</button>
   <img class="about-icon" src="icon128.png" alt="ClearFeed"/>
   <div class="about-name">ClearFeed</div>
   <div class="about-ver" id="aboutVer"></div>
   <p class="about-tag" data-i18n="tagline">Focus on what matters to you</p>
+  <p class="about-desc" data-i18n="aboutHow"></p>
   <p class="about-desc" data-i18n="aboutDesc"></p>
   <p class="about-foss" data-i18n="aboutFoss"></p>
   <div class="about-links">

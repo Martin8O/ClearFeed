@@ -89,12 +89,14 @@ test("i18n: t falls back to English, fmt fills placeholders", () => {
   assert.equal(popup.t("xx", "save"), "Save");       // unknown language -> English
   assert.equal(popup.t("en", "___nope"), "___nope"); // unknown key -> key itself
   assert.equal(popup.fmt("Delete {name}?", { name: "Sports" }), "Delete Sports?");
-  assert.deepEqual(Array.from(popup.uiLangCodes()), ["en", "es", "de", "fr", "cs", "pl"]);
+  assert.deepEqual(Array.from(popup.uiLangCodes()),
+    ["en", "es", "de", "fr", "cs", "pl", "it", "pt", "nl", "ru", "uk", "tr", "sv", "da", "no", "fi"]);
 });
 
 test("presets: each language exposes the same topics with non-empty words", () => {
   const langs = Array.from(popup.presetLangCodes());
-  assert.deepEqual(langs, ["en", "es", "de", "fr", "cs", "pl"]);
+  assert.deepEqual(langs,
+    ["en", "es", "de", "fr", "cs", "pl", "it", "pt", "nl", "ru", "uk", "tr", "sv", "da", "no", "fi"]);
   const baseIds = Array.from(popup.getPresets("en").map((p) => p.id)).sort();
   for (const l of langs) {
     const ps = popup.getPresets(l);
@@ -123,4 +125,15 @@ test("localized preset words actually match local-language content", () => {
   assert.equal(blocks("Bundesliga: Tor in der Nachspielzeit", [{ enabled: true, words: deSports.words }]), true);
   assert.equal(blocks("Sledujte dnešní fotbalový zápas", [{ enabled: true, words: csSports.words }]), true);
   assert.equal(blocks("Wyniki wyborów parlamentarnych", [{ enabled: true, words: plPolitics.words }]), true);
+
+  const itPolitics = popup.getPresets("it").find((p) => p.id === "politics");
+  const ruSports = popup.getPresets("ru").find((p) => p.id === "sports");
+  const nlPolitics = popup.getPresets("nl").find((p) => p.id === "politics");
+  const fiPolitics = popup.getPresets("fi").find((p) => p.id === "politics");
+  assert.equal(blocks("Risultati delle elezioni regionali", [{ enabled: true, words: itPolitics.words }]), true);
+  assert.equal(blocks("Сборная вышла в финал чемпионата", [{ enabled: true, words: ruSports.words }]), true);
+  assert.equal(blocks("Uitslag van de verkiezingen vandaag", [{ enabled: true, words: nlPolitics.words }]), true);
+  assert.equal(blocks("Eduskuntavaalit pidetään keväällä", [{ enabled: true, words: fiPolitics.words }]), true);
+  // Conservative stems must not over-match unrelated words:
+  assert.equal(blocks("Голосование показало рост", [{ enabled: true, words: ruSports.words }]), false, "ru sports must not catch 'голосование' via a bare 'гол'");
 });

@@ -25,6 +25,7 @@ chrome.storage.local.get(["enabled","blockedTotal","categories","excludedSites",
   state.theme         = pickTheme(data.theme);
 
   applyTheme(state.theme);
+  document.documentElement.classList.add("cf-ready"); // reveal once themed (no flash)
   buildLangOptions();
   applyI18n();
   document.getElementById("count").textContent = state.blockedTotal;
@@ -67,6 +68,7 @@ function applyI18n() {
   });
   document.getElementById("themeBtn").title = tr("theme");
   document.getElementById("coffeeBtn").title = tr("coffee");
+  document.getElementById("langTrigger").title = tr("language");
   document.documentElement.lang = state.uiLang;
 }
 
@@ -85,40 +87,71 @@ document.getElementById("themeBtn").addEventListener("click", () => {
 // --- About panel + links ---
 function openUrl(url) { if (url) chrome.tabs.create({ url }); }
 
+// About replaces the main view (rather than overlaying it), so the document
+// shrinks to the panel's height and the popup window shows no scrollbar.
 document.getElementById("aboutBtn").addEventListener("click", () => {
+  document.getElementById("mainView").hidden = true;
   document.getElementById("aboutPanel").hidden = false;
 });
 document.getElementById("aboutClose").addEventListener("click", () => {
   document.getElementById("aboutPanel").hidden = true;
+  document.getElementById("mainView").hidden = false;
 });
 document.getElementById("aboutGithub").addEventListener("click", () => openUrl(REPO_URL));
 document.getElementById("aboutPrivacy").addEventListener("click", () => openUrl(REPO_URL + "/blob/main/PRIVACY.md"));
 document.getElementById("coffeeBtn").addEventListener("click", () => openUrl(COFFEE_URL));
 document.getElementById("aboutCoffee").addEventListener("click", () => openUrl(COFFEE_URL));
 
-function buildLangOptions() {
-  const sel = document.getElementById("langSelect");
-  sel.innerHTML = "";
-  LANGS.forEach((l) => {
-    const o = document.createElement("option");
-    o.value = l.code; o.textContent = l.label;
-    sel.appendChild(o);
-  });
-  sel.value = state.uiLang;
+// Custom language dropdown (a native <select> can't render SVG flags). The
+// trigger shows just the current flag; the menu lists flag + native name.
+function langFlag(code) { return `<span class="flag">${flagSvg(code)}</span>`; }
+
+function updateLangTrigger() {
+  document.getElementById("langTrigger").innerHTML =
+    langFlag(state.uiLang) + `<span class="caret">▼</span>`;
 }
 
-document.getElementById("langSelect").addEventListener("change", (e) => {
-  state.uiLang = e.target.value;
+function buildLangOptions() {
+  const menu = document.getElementById("langMenu");
+  menu.innerHTML = "";
+  LANGS.forEach((l) => {
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "lang-opt" + (l.code === state.uiLang ? " sel" : "");
+    btn.setAttribute("role", "option");
+    btn.innerHTML = langFlag(l.code) + `<span>${esc(l.label)}</span>`;
+    btn.addEventListener("click", () => { setLang(l.code); closeLangMenu(); });
+    li.appendChild(btn);
+    menu.appendChild(li);
+  });
+  updateLangTrigger();
+}
+
+function openLangMenu()  { document.getElementById("langMenu").hidden = false; document.getElementById("langTrigger").setAttribute("aria-expanded", "true"); }
+function closeLangMenu() { document.getElementById("langMenu").hidden = true;  document.getElementById("langTrigger").setAttribute("aria-expanded", "false"); }
+
+document.getElementById("langTrigger").addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (document.getElementById("langMenu").hidden) openLangMenu(); else closeLangMenu();
+});
+document.addEventListener("click", (e) => { if (!e.target.closest("#langDd")) closeLangMenu(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLangMenu(); });
+
+function setLang(code) {
+  if (code === state.uiLang) return;
+  state.uiLang = code;
   const changed = relocalizeCategories(state.uiLang); // keep added topics in one language
   saveSettings();
   applyI18n();
   setMasterToggle(state.enabled);     // refresh localized label
+  buildLangOptions();                 // refresh selected highlight + trigger flag
   renderCategories();
   renderPresets();
   renderExcluded();
   refreshRevealButton();
   if (changed) broadcastReload();
-});
+}
 
 // --- Master toggle ---
 function setMasterToggle(enabled) {
@@ -184,8 +217,8 @@ function renderPresets() {
   available.forEach((p) => {
     const chip = document.createElement("button");
     chip.className = "preset-chip";
-    chip.innerHTML = `<span class="pdot" style="background:${p.color}"></span>` +
-      `<span class="picon">${esc(p.icon)}</span>` +
+    // p.icon is a trusted inline-SVG constant from presets.js (not user data).
+    chip.innerHTML = `<span class="picon" style="color:${p.color}">${p.icon}</span>` +
       `<span class="pname">${esc(p.name)}</span><span class="pplus">+</span>`;
     chip.addEventListener("click", () => addPreset(p));
     list.appendChild(chip);

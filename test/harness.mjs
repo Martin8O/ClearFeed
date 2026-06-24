@@ -35,6 +35,8 @@ export function loadModule(file) {
     createElement() { return fakeEl(); },
     querySelector() { return fakeEl(); },
     querySelectorAll() { return []; },
+    addEventListener() {},
+    documentElement: fakeEl(),
     body: fakeEl(),
   };
   const ctx = vm.createContext({
