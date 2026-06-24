@@ -1,8 +1,8 @@
 {
   "name": "clearfeed",
-  "version": "1.5.0",
+  "version": "2.1.0",
   "private": true,
-  "description": "Chrome extension that hides sports — or any words you choose — from news feeds.",
+  "description": "Chrome extension that mutes topics you'd rather not see — politics, gossip, spoilers or any keywords — from news feeds.",
   "scripts": {
     "test": "node --test"
   },

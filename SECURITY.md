@@ -25,8 +25,9 @@ Two kinds of tests:
    the build if it finds any of:
    - network primitives: `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource`, `sendBeacon`
    - remote/dynamic code: `eval(`, `new Function(`, `importScripts`
-   - external URLs (`http://` / `https://`) in code
    - storage that can outlive/leak the session: `document.cookie`, `localStorage`, `indexedDB`
+   - any external URL that isn't on a small allowlist (currently just the GitHub repo link
+     shown in the About panel — see below)
 
 2. **Logic tests** (`test/logic.test.mjs`) — exercise the real matching and validation code
    (word-boundary matching, domain normalization, excluded-site matching, HTML escaping) so
@@ -45,6 +46,13 @@ ClearFeed requests the minimum needed to work:
 The host match (`<all_urls>`) is the broadest-looking part, so to be explicit: it grants the
 ability to *read and hide elements on the current page*. Because there is no network code
 (proven by the safety audit), that access **cannot** be turned into data collection.
+
+## Outbound links
+
+The only external URL in the code is the **GitHub repository link** in the About panel. It is
+opened in a new browser tab **only when the user clicks it** — it is a normal navigation you
+initiate, not a background request the extension makes. The safety audit allowlists this single
+URL and fails the build if any other external URL appears.
 
 ## Code-injection safety
 

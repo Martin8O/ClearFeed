@@ -33,6 +33,9 @@ const UI = {
     backup: "Backup", export: "Export", import: "Import",
     exported: "Settings exported.", importedN: "Imported {n} topics.", importFail: "Import failed.",
     words: "words", language: "Language",
+    about: "About", theme: "Toggle theme", coffee: "Buy me a coffee",
+    github: "View source on GitHub", privacy: "Privacy policy",
+    aboutDesc: "Free & open source. No accounts, no tracking — your settings never leave your device.",
   },
   es: {
     tagline: "Céntrate en lo que te importa",
@@ -51,6 +54,9 @@ const UI = {
     backup: "Copia de seguridad", export: "Exportar", import: "Importar",
     exported: "Ajustes exportados.", importedN: "{n} temas importados.", importFail: "Error al importar.",
     words: "palabras", language: "Idioma",
+    about: "Acerca de", theme: "Cambiar tema", coffee: "Invítame a un café",
+    github: "Ver código en GitHub", privacy: "Política de privacidad",
+    aboutDesc: "Gratis y de código abierto. Sin cuentas ni rastreo: tus ajustes nunca salen de tu dispositivo.",
   },
   de: {
     tagline: "Konzentrier dich auf das Wesentliche",
@@ -69,6 +75,9 @@ const UI = {
     backup: "Backup", export: "Exportieren", import: "Importieren",
     exported: "Einstellungen exportiert.", importedN: "{n} Themen importiert.", importFail: "Import fehlgeschlagen.",
     words: "Wörter", language: "Sprache",
+    about: "Über", theme: "Design wechseln", coffee: "Spendier mir einen Kaffee",
+    github: "Quellcode auf GitHub", privacy: "Datenschutz",
+    aboutDesc: "Kostenlos & quelloffen. Keine Konten, kein Tracking — deine Einstellungen verlassen nie dein Gerät.",
   },
   fr: {
     tagline: "Concentre-toi sur l'essentiel",
@@ -87,6 +96,9 @@ const UI = {
     backup: "Sauvegarde", export: "Exporter", import: "Importer",
     exported: "Paramètres exportés.", importedN: "{n} thèmes importés.", importFail: "Échec de l'import.",
     words: "mots", language: "Langue",
+    about: "À propos", theme: "Changer de thème", coffee: "Offre-moi un café",
+    github: "Code source sur GitHub", privacy: "Confidentialité",
+    aboutDesc: "Gratuit et open source. Pas de comptes, pas de pistage — tes réglages ne quittent jamais ton appareil.",
   },
 };
 

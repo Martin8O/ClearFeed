@@ -3,6 +3,19 @@
 All notable changes to ClearFeed are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.1] - 2026-06-24
+
+### Added
+- **Light / dark theme** with a one-tap toggle in the header (defaults to your system
+  preference, then remembers your choice). Full UI restyle via CSS variables.
+- **About panel** — app version, tagline, links to the source and privacy policy.
+- **"Buy me a coffee"** button (coffee icon) — a placeholder for future support links.
+
+### Changed
+- Cleaner, more elegant popup visuals (spacing, rounded cards, accent color, transitions).
+- The safety audit now allowlists the single user-clicked GitHub link instead of banning all
+  URLs — it still fails on any network call or unexpected URL.
+
 ## [2.0] - 2026-06-24
 
 ### Changed

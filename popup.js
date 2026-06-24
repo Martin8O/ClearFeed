@@ -6,26 +6,45 @@
 const DEFAULT_CATEGORIES = []; // first run: no topics; user picks from suggestions
 const COLORS = ["#e74c3c","#e67e22","#f39c12","#27ae60","#2980b9","#8e44ad","#16a085","#c0392b"];
 
-let state = { enabled: true, blockedTotal: 0, categories: [], excludedSites: [], uiLang: "en" };
+// The only external link in the extension — opened in a new tab on user click.
+const REPO_URL = "https://github.com/Martin8O/ClearFeed";
+const COFFEE_URL = ""; // TODO: paste your "Buy Me a Coffee" URL here to enable the button.
+
+let state = { enabled: true, blockedTotal: 0, categories: [], excludedSites: [], uiLang: "en", theme: "light" };
 
 // --- Init ---
-chrome.storage.local.get(["enabled","blockedTotal","categories","excludedSites","uiLang"], (data) => {
+chrome.storage.local.get(["enabled","blockedTotal","categories","excludedSites","uiLang","theme"], (data) => {
   state.enabled       = data.enabled !== false;
   state.blockedTotal  = data.blockedTotal || 0;
   state.categories    = data.categories  || DEFAULT_CATEGORIES;
   state.excludedSites = data.excludedSites || [];
   state.uiLang        = pickLang(data.uiLang);
+  state.theme         = pickTheme(data.theme);
 
+  applyTheme(state.theme);
   buildLangOptions();
   applyI18n();
   document.getElementById("count").textContent = state.blockedTotal;
   setMasterToggle(state.enabled);
+  setVersion();
 
   renderCategories();
   renderPresets();
   renderExcluded();
   refreshRevealButton();
 });
+
+function pickTheme(stored) {
+  if (stored === "light" || stored === "dark") return stored;
+  const m = (typeof matchMedia === "function") && matchMedia("(prefers-color-scheme: dark)").matches;
+  return m ? "dark" : "light";
+}
+
+function setVersion() {
+  const v = "v" + (chrome.runtime.getManifest ? chrome.runtime.getManifest().version : "");
+  document.getElementById("version").textContent = v;
+  document.getElementById("aboutVer").textContent = v;
+}
 
 function pickLang(stored) {
   const codes = uiLangCodes();
@@ -44,8 +63,36 @@ function applyI18n() {
   document.querySelectorAll("[data-i18n-ph]").forEach((el) => {
     el.placeholder = tr(el.dataset.i18nPh);
   });
+  document.getElementById("themeBtn").title = tr("theme");
+  document.getElementById("coffeeBtn").title = tr("coffee");
   document.documentElement.lang = state.uiLang;
 }
+
+// --- Theme (light / dark) ---
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme === "dark" ? "dark" : "light";
+  document.getElementById("themeBtn").textContent = theme === "dark" ? "☀️" : "🌙";
+}
+
+document.getElementById("themeBtn").addEventListener("click", () => {
+  state.theme = state.theme === "dark" ? "light" : "dark";
+  applyTheme(state.theme);
+  saveSettings();
+});
+
+// --- About panel + links ---
+function openUrl(url) { if (url) chrome.tabs.create({ url }); }
+
+document.getElementById("aboutBtn").addEventListener("click", () => {
+  document.getElementById("aboutPanel").hidden = false;
+});
+document.getElementById("aboutClose").addEventListener("click", () => {
+  document.getElementById("aboutPanel").hidden = true;
+});
+document.getElementById("aboutGithub").addEventListener("click", () => openUrl(REPO_URL));
+document.getElementById("aboutPrivacy").addEventListener("click", () => openUrl(REPO_URL + "/blob/main/PRIVACY.md"));
+document.getElementById("coffeeBtn").addEventListener("click", () => openUrl(COFFEE_URL));
+document.getElementById("aboutCoffee").addEventListener("click", () => openUrl(COFFEE_URL));
 
 function buildLangOptions() {
   const sel = document.getElementById("langSelect");
@@ -360,7 +407,9 @@ document.getElementById("importFile").addEventListener("change", (e) => {
       state.categories = parsed.categories;
       state.excludedSites = parsed.excludedSites;
       if (parsed.uiLang) state.uiLang = parsed.uiLang;
+      if (parsed.theme) state.theme = parsed.theme;
       saveSettings();
+      applyTheme(state.theme);
       buildLangOptions();
       applyI18n();
       setMasterToggle(state.enabled);
@@ -406,7 +455,8 @@ function sanitizeSettings(obj) {
     : [];
   const uiLang = (typeof obj.uiLang === "string" && uiLangCodes().includes(obj.uiLang))
     ? obj.uiLang : undefined;
-  return { enabled: obj.enabled !== false, categories, excludedSites, uiLang };
+  const theme = (obj.theme === "light" || obj.theme === "dark") ? obj.theme : undefined;
+  return { enabled: obj.enabled !== false, categories, excludedSites, uiLang, theme };
 }
 
 // --- Helpers ---
@@ -418,6 +468,7 @@ function saveSettings() {
   chrome.storage.local.set({
     enabled: state.enabled,
     uiLang: state.uiLang,
+    theme: state.theme,
     categories: state.categories,
     excludedSites: state.excludedSites
   });

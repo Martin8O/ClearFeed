@@ -25,7 +25,6 @@ const FORBIDDEN = [
   [/\beval\s*\(/, "dynamic code execution via eval()"],
   [/\bnew\s+Function\s*\(/, "dynamic code execution via new Function()"],
   [/\bimportScripts\b/, "remote script import"],
-  [/https?:\/\//, "external URL in shipped code"],
   [/\bdocument\.cookie\b/, "cookie access"],
   [/\blocalStorage\b/, "localStorage usage"],
   [/\bindexedDB\b/, "indexedDB usage"],
@@ -49,6 +48,23 @@ for (const file of CODE_FILES) {
     assert.deepEqual(hits, [], hits.join("\n"));
   });
 }
+
+// External URLs are allowed ONLY for explicit, user-initiated links (opened in a new
+// tab on click — never a background request). This test documents exactly which ones
+// exist and fails if any unexpected URL is added.
+const ALLOWED_URLS = new Set([
+  "https://github.com/Martin8O/ClearFeed",
+]);
+
+test("only allowlisted external URLs appear in shipped code", () => {
+  const offenders = [];
+  for (const file of CODE_FILES) {
+    const text = fs.readFileSync(path.join(ROOT, file), "utf8");
+    const urls = text.match(/https?:\/\/[^\s"'`)]+/g) || [];
+    for (const u of urls) if (!ALLOWED_URLS.has(u)) offenders.push(`${file}: ${u}`);
+  }
+  assert.deepEqual(offenders, [], offenders.join("\n"));
+});
 
 test("content script declares no host beyond <all_urls> read scope", () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, "manifest.json"), "utf8"));

@@ -28,6 +28,10 @@ That's it. This data never leaves your computer.
 - ❌ **No accounts, ads, or selling of data.** There is nothing to sell — we never receive it.
 - ❌ **No cookies, `localStorage`, or `indexedDB`.** Only the local extension settings store.
 
+The only outbound link is the **GitHub repository** link in the About panel — it opens in a new
+tab when *you* click it (a normal navigation you initiate), and ClearFeed still makes no
+background requests of its own.
+
 ## How page scanning works
 
 To hide unwanted articles, ClearFeed reads the **text already on the page in your browser**
