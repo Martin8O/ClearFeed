@@ -17,10 +17,14 @@
       background: #1a1a2e;
       color: #fff;
       padding: 14px 16px;
-      display: flex; align-items: center; justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
     }
-    .header-left h1 { font-size: 14px; font-weight: 600; }
-    .header-left p  { font-size: 11px; color: #9a9ab0; margin-top: 1px; }
+    .header-left h1 { font-size: 15px; font-weight: 700; letter-spacing: -.2px; }
+    .header-left p  { font-size: 11px; color: #9a9ab0; margin-top: 2px; }
+    .lang-select {
+      background: #2a2a44; color: #fff; border: 1px solid #3a3a58; border-radius: 6px;
+      font-size: 11px; padding: 4px 6px; cursor: pointer; outline: none; max-width: 96px;
+    }
 
     .stat-bar {
       background: #fff; border-bottom: 1px solid #eee;
@@ -46,7 +50,8 @@
       text-transform: uppercase; letter-spacing: 0.8px; color: #999;
     }
 
-    .cat-list { padding: 0 10px 6px; }
+    .cat-list { padding: 0 10px 2px; }
+    .empty-cats { padding: 2px 16px 8px; font-size: 12px; color: #9a9aa5; line-height: 1.5; }
     .cat-card {
       background: #fff; border-radius: 8px; margin-bottom: 6px;
       border: 1px solid #e8e8e8; overflow: hidden; transition: box-shadow .15s;
@@ -85,6 +90,18 @@
       padding: 5px 10px; font-size: 12px; color: #e74c3c; cursor: pointer;
     }
     .btn-delete:hover { background: #fff0f0; }
+
+    /* SUGGESTED TOPIC PRESETS */
+    .preset-list { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 6px; }
+    .preset-chip {
+      display: flex; align-items: center; gap: 6px; background: #fff;
+      border: 1px solid #e0e0ea; border-radius: 20px; padding: 6px 12px;
+      font-size: 12px; cursor: pointer; color: #3a3a5a; transition: .12s;
+    }
+    .preset-chip:hover { border-color: #7c83fd; background: #f5f5ff; }
+    .preset-chip .pdot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .preset-chip .pplus { color: #2ecc71; font-weight: 700; }
+    .preset-empty { padding: 0 16px 6px; font-size: 11px; color: #bbb; font-style: italic; }
 
     .add-section { padding: 4px 10px 12px; }
     .add-row { display: flex; gap: 6px; }
@@ -166,19 +183,20 @@
 
 <div class="header">
   <div class="header-left">
-    <h1>⛔ ClearFeed</h1>
-    <p>Hide articles by category</p>
+    <h1>ClearFeed</h1>
+    <p data-i18n="tagline">Focus on what matters to you</p>
   </div>
+  <select class="lang-select" id="langSelect" title="Language"></select>
 </div>
 
 <div class="stat-bar">
   <strong id="count">0</strong>
-  articles hidden
-  <button class="reset" id="resetBtn" title="Reset counter">↺ reset</button>
+  <span data-i18n="articlesHidden">items hidden</span>
+  <button class="reset" id="resetBtn" data-i18n="reset" title="reset">reset</button>
 </div>
 
 <div class="master-row">
-  <span class="master-label" id="masterLabel">Blocking active</span>
+  <span class="master-label" id="masterLabel">Filtering on</span>
   <label class="switch">
     <input type="checkbox" id="masterToggle"/>
     <span class="slider"></span>
@@ -189,38 +207,43 @@
   <button class="btn-reveal" id="revealBtn" disabled>Nothing hidden on this page</button>
 </div>
 
-<div class="section-header">Categories</div>
+<div class="section-header" data-i18n="categories">Your topics</div>
 <div class="cat-list" id="catList"></div>
+<div class="empty-cats" id="emptyCats" data-i18n="emptyCats" hidden></div>
 
-<div class="section-header">Add category</div>
+<div class="section-header" data-i18n="suggested">Suggested topics</div>
+<div class="preset-list" id="presetList"></div>
+
+<div class="section-header" data-i18n="addCategory">Add your own</div>
 <div class="add-section">
   <div class="add-row">
-    <input type="text" class="add-name-input" id="newCatName" placeholder="Category name…" maxlength="30"/>
-    <button class="btn-add" id="addCatBtn">+ Add</button>
+    <input type="text" class="add-name-input" id="newCatName" data-i18n-ph="catNamePlaceholder" placeholder="Topic name…" maxlength="30"/>
+    <button class="btn-add" id="addCatBtn" data-i18n="add">Add</button>
   </div>
 </div>
 
-<div class="section-header">Excluded sites — never blocked here</div>
+<div class="section-header" data-i18n="excludedHeader">Never filter on these sites</div>
 <div class="excl-section">
-  <button class="btn-excl-current" id="exclCurrentBtn">＋ Exclude the site I'm currently on</button>
+  <button class="btn-excl-current" id="exclCurrentBtn" data-i18n="excludeCurrent">Don't filter the site I'm on</button>
   <div class="excl-list" id="exclList"></div>
   <div class="add-row" style="margin-top:7px">
-    <input type="text" class="add-name-input" id="newExclDomain" placeholder="e.g. mybank.com" maxlength="80"/>
-    <button class="btn-add" id="addExclBtn">+ Add</button>
+    <input type="text" class="add-name-input" id="newExclDomain" data-i18n-ph="exclPlaceholder" placeholder="e.g. mybank.com" maxlength="80"/>
+    <button class="btn-add" id="addExclBtn" data-i18n="add">Add</button>
   </div>
 </div>
 
-<div class="section-header">Backup</div>
+<div class="section-header" data-i18n="backup">Backup</div>
 <div class="backup-section">
   <div class="backup-row">
-    <button class="btn-backup" id="exportBtn">⬇ Export settings</button>
-    <button class="btn-backup" id="importBtn">⬆ Import settings</button>
+    <button class="btn-backup" id="exportBtn" data-i18n="export">Export</button>
+    <button class="btn-backup" id="importBtn" data-i18n="import">Import</button>
   </div>
   <input type="file" id="importFile" accept="application/json,.json" hidden/>
   <div class="backup-msg" id="backupMsg"></div>
 </div>
 
-<script src="words.js"></script>
+<script src="i18n.js"></script>
+<script src="presets.js"></script>
 <script src="popup.js"></script>
 </body>
 </html>

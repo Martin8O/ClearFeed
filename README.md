@@ -5,24 +5,24 @@
 [![No network calls](https://img.shields.io/badge/network%20requests-zero-brightgreen.svg)](SECURITY.md#automated-safety-checks)
 [![No tracking](https://img.shields.io/badge/tracking-none-brightgreen.svg)](PRIVACY.md)
 
-A lightweight Chrome extension (Manifest V3) that hides unwanted content — sports by default, or **any words you choose** — from news sites and feeds.
+**Clean your feed. Focus on what matters to you.** ClearFeed is a lightweight Chrome extension (Manifest V3) that quietly mutes the topics you'd rather not see — politics, gossip, spoilers, sports, or **any keywords you choose** — across news sites and feeds. You stay in control: nothing is muted unless you ask for it.
 
-![ClearFeed demo — sports articles disappearing from a news feed](assets/demo.gif)
+![ClearFeed demo — distracting articles disappearing from a news feed](assets/demo.gif)
 
 ## Features
 
-- **Category-based blocking.** Ships with an editable **Sport** category and lets you add your own (politics, celebrities, a specific team — anything).
-- **Fully editable word lists.** Every category, including the built-in Sport one, uses a word list you can edit at any time. A word *stem* is enough: `elect` catches *election*, *elections*, *electoral*…
-- **Per-category on/off** toggles, plus a master switch to pause all blocking.
-- **Excluded sites.** Add domains (banking, e-mail, …) where blocking should never run — one click excludes the site you're currently on.
-- **Hidden-article counter** so you can see how much noise it filters out.
-- **Reveal hidden items** — one click temporarily shows what was hidden on the current page (outlined), then re-hides it, so nothing happens behind your back.
-- **Settings backup** — export your categories and excluded sites to a JSON file and import them on another machine.
-- **Word-boundary matching** so short words won't match inside unrelated words.
+- **Pick your topics.** Start from one-click **suggested topics** (Politics, Celebrity gossip, Crime & disasters, Money & crypto, Spoilers, Sports) or add your own — each comes with a ready-made keyword list.
+- **Fully editable.** Every topic is just an editable keyword list. A word *stem* is enough: `elect` catches *election*, *elections*, *electoral*…
+- **Multi-language.** Switch the app language and seeded word lists between **English, Español, Deutsch and Français** — so filtering works on your local news too.
+- **Per-topic on/off** toggles, plus a master switch to pause everything.
+- **Excluded sites.** Add domains (banking, e-mail, …) where filtering should never run — one click excludes the site you're on.
+- **Reveal hidden items** — one click temporarily shows what was hidden on the page (outlined), then re-hides it, so nothing happens behind your back.
+- **Settings backup** — export your topics and excluded sites to a JSON file and import them on another machine.
+- **Counter** of how much noise it has filtered out, and **word-boundary matching** so short words won't match inside unrelated words.
 
 ## How it works
 
-A content script scans article-like elements on each page and hides any whose text matches an enabled category's words. Dynamic content (infinite scroll, AJAX feeds) is handled with a debounced `MutationObserver`. Settings live in `chrome.storage.local`.
+On first run nothing is filtered — you choose topics from the popup. A content script then scans article-like elements on each page and hides any whose text matches an enabled topic's words. Dynamic content (infinite scroll, AJAX feeds) is handled with a debounced `MutationObserver`. Settings live in `chrome.storage.local`.
 
 ## Privacy & safety
 
@@ -52,7 +52,7 @@ This runs the **safety audit** (`test/safety.test.mjs`, scans shipped code for u
 1. Open `chrome://extensions`.
 2. Enable **Developer mode** (top-right).
 3. Click **Load unpacked** and select this folder.
-4. Pin the ClearFeed icon and open the popup to configure categories.
+4. Pin the ClearFeed icon and open the popup to pick your topics.
 
 ## Files
 
@@ -60,6 +60,7 @@ This runs the **safety audit** (`test/safety.test.mjs`, scans shipped code for u
 |------|---------|
 | `manifest.json` | Extension manifest (MV3) |
 | `content.js` | Scans pages and hides matching articles |
-| `words.js` | Default Sport word list used to seed the category |
-| `popup.html` / `popup.js` | Settings UI (categories, excluded sites, counter) |
+| `presets.js` | Suggested topics + seeded word lists per language |
+| `i18n.js` | UI strings for the in-app language switcher |
+| `popup.html` / `popup.js` | Settings UI (topics, excluded sites, counter) |
 | `icon16/48/128.png` | Toolbar / store icons |

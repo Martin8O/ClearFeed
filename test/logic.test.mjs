@@ -26,7 +26,7 @@ test("disabled categories contribute no matchers", () => {
   assert.equal(blocks("football everywhere", cats), false);
 });
 
-test("default Sport seed compiles and matches sport content", () => {
+test("seeded words compile and match content", () => {
   const seeded = [{ enabled: true, words: popup.parseWords("nhl, wimbledon, formula 1") }];
   assert.equal(blocks("The NHL playoffs continue", seeded), true);
   assert.equal(blocks("Wimbledon final set", seeded), true);
@@ -82,4 +82,33 @@ test("sanitizeSettings throws on invalid input", () => {
   assert.throws(() => popup.sanitizeSettings(null));
   assert.throws(() => popup.sanitizeSettings([]));
   assert.throws(() => popup.sanitizeSettings({ foo: 1 }), /no categories/);
+});
+
+test("i18n: t falls back to English, fmt fills placeholders", () => {
+  assert.equal(popup.t("es", "save"), "Guardar");
+  assert.equal(popup.t("xx", "save"), "Save");       // unknown language -> English
+  assert.equal(popup.t("en", "___nope"), "___nope"); // unknown key -> key itself
+  assert.equal(popup.fmt("Delete {name}?", { name: "Sports" }), "Delete Sports?");
+  assert.deepEqual(Array.from(popup.uiLangCodes()), ["en", "es", "de", "fr"]);
+});
+
+test("presets: each language exposes the same topics with non-empty words", () => {
+  const langs = Array.from(popup.presetLangCodes());
+  assert.deepEqual(langs, ["en", "es", "de", "fr"]);
+  const baseIds = Array.from(popup.getPresets("en").map((p) => p.id)).sort();
+  for (const l of langs) {
+    const ps = popup.getPresets(l);
+    assert.deepEqual(Array.from(ps.map((p) => p.id)).sort(), baseIds, `same topic ids for ${l}`);
+    for (const p of ps) {
+      assert.ok(p.name && p.name.length, `name present for ${l}/${p.id}`);
+      assert.ok(p.words.length >= 5, `enough words for ${l}/${p.id}`);
+    }
+  }
+});
+
+test("localized preset words actually match local-language content", () => {
+  const esPolitics = popup.getPresets("es").find((p) => p.id === "politics");
+  const deSports = popup.getPresets("de").find((p) => p.id === "sports");
+  assert.equal(blocks("Resultados de las elecciones municipales", [{ enabled: true, words: esPolitics.words }]), true);
+  assert.equal(blocks("Bundesliga: Tor in der Nachspielzeit", [{ enabled: true, words: deSports.words }]), true);
 });

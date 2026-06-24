@@ -39,12 +39,14 @@ export function loadModule(file) {
   };
   const ctx = vm.createContext({
     chrome, document, console, URL,
+    navigator: { language: "en" },
     location: { hostname: "" },
     setTimeout() {}, clearTimeout() {},
     MutationObserver: class { observe() {} disconnect() {} },
   });
-  // words.js first (defines DEFAULT_SPORT_WORDS, shared by both contexts).
-  vm.runInContext(fs.readFileSync(path.join(ROOT, "words.js"), "utf8"), ctx);
+  // Shared globals loaded before the module under test (as in popup.html).
+  vm.runInContext(fs.readFileSync(path.join(ROOT, "i18n.js"), "utf8"), ctx);
+  vm.runInContext(fs.readFileSync(path.join(ROOT, "presets.js"), "utf8"), ctx);
   vm.runInContext(fs.readFileSync(path.join(ROOT, file), "utf8"), ctx);
   return ctx;
 }

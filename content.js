@@ -24,17 +24,9 @@ const ARTICLE_SELECTORS = [
   "li[class]",
 ];
 
-// Sport is seeded from words.js (DEFAULT_SPORT_WORDS) on first run,
-// then becomes a normal editable category in storage.
-const DEFAULT_CATEGORIES = [
-  {
-    id: "sport",
-    name: "Sport",
-    enabled: true,
-    color: "#e74c3c",
-    words: (typeof DEFAULT_SPORT_WORDS !== "undefined") ? DEFAULT_SPORT_WORDS.slice() : []
-  }
-];
+// No categories on first run — the user chooses topics to mute from the popup's
+// suggested-topic library (or adds their own). Storage is the source of truth.
+const DEFAULT_CATEGORIES = [];
 
 let isEnabled = true;
 let activeMatchers = [];

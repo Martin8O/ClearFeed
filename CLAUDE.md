@@ -6,7 +6,9 @@ Guidance for Claude Code (and other AI assistants) working in this repository.
 
 **ClearFeed** is a Chrome extension (Manifest V3, no build step, no dependencies) that
 hides unwanted content from news sites and feeds. It blocks elements whose text matches
-words from user-defined **categories**. Ships with an editable **Sport** category.
+words from user-defined **topics** (categories). On first run nothing is filtered — the user
+adds topics from a built-in **suggested-topic library** (or their own). The UI and the seeded
+word lists are localized (EN/ES/DE/FR) with a runtime language switcher.
 
 There is no framework, bundler, or package manager — the files are loaded directly by
 Chrome as an unpacked extension. Edit the source files and reload the extension to test.
@@ -15,31 +17,34 @@ Chrome as an unpacked extension. Edit the source files and reload the extension 
 
 Two execution contexts that communicate through `chrome.storage.local` and runtime messages:
 
-- **Content script** (`words.js` + `content.js`) — injected into every page (`<all_urls>`)
-  at `document_idle`. Scans article-like elements and hides matches.
-- **Popup** (`popup.html` + `popup.js`, with `words.js`) — the settings UI shown from the
-  toolbar icon. Reads/writes settings and tells the active tab to re-scan.
+- **Content script** (`content.js`) — injected into every page (`<all_urls>`) at
+  `document_idle`. Scans article-like elements and hides matches. No category seed of its own
+  (default is empty); storage is the source of truth.
+- **Popup** (`popup.html` + `popup.js`, with `i18n.js` + `presets.js`) — the settings UI shown
+  from the toolbar icon. Reads/writes settings and tells tabs to re-scan.
 
 ### Files
 
 | File | Role |
 |------|------|
 | `manifest.json` | MV3 manifest. Bump `version` here on release. |
-| `words.js` | Defines `DEFAULT_SPORT_WORDS` — the seed list for the Sport category. Loaded first in **both** contexts, so it's a shared global. |
-| `content.js` | Page scanner: builds regex matchers, hides matching elements, counts them, watches dynamic content. |
-| `popup.js` | Settings UI logic: categories, excluded sites, master toggle, counter. |
-| `popup.html` | Popup markup + CSS (inline `<style>`). |
+| `i18n.js` | `UI` strings + `LANGS` + `t(lang,key)` / `fmt()`. Loaded before `popup.js`. |
+| `presets.js` | Suggested topics: `PRESET_META` + per-language `PRESET_CONTENT`; `getPresets(lang)`. Loaded before `popup.js`. |
+| `content.js` | Page scanner: builds regex matchers, hides matching elements, counts them, watches dynamic content, reveal mode. |
+| `popup.js` | Settings UI logic: topics, suggested presets, language switch, excluded sites, master toggle, counter, backup. |
+| `popup.html` | Popup markup + CSS (inline `<style>`); text marked with `data-i18n`/`data-i18n-ph`. |
 | `icon16/48/128.png` | Toolbar/store icons. Regenerate with the PIL script (see below). |
 
 ### Data model (in `chrome.storage.local`)
 
 - `enabled` — master on/off. Read as `data.enabled !== false` (defaults to on).
-- `categories` — array of `{ id, name, enabled, color, words[] }`. Sport has `id: "sport"`.
-  Seeded from `DEFAULT_CATEGORIES` on first run; afterwards storage is the source of truth.
+- `categories` — array of `{ id, name, enabled, color, words[] }`. Empty on first run.
+  Added from presets (id `preset_<topic>_<lang>`) or custom (`cat_<ts>`).
 - `excludedSites` — array of domains where scanning never runs (matches subdomains too).
+- `uiLang` — selected app language (`en`/`es`/`de`/`fr`); defaults from `navigator.language`.
 - `blockedTotal` — running count of hidden elements.
 
-`DEFAULT_CATEGORIES` is duplicated in `content.js` and `popup.js` — **keep both in sync.**
+`DEFAULT_CATEGORIES` (now `[]`) exists in both `content.js` and `popup.js` — keep in sync.
 
 ### How blocking works
 
@@ -68,13 +73,18 @@ scanned-but-clean elements get `data-cf-seen`. Settings import is validated/norm
 
 ## Conventions
 
-- **English only** in UI text, comments, and docs.
+- **Welcoming, topic-neutral framing** — ClearFeed helps users *focus*, it isn't anti-anything.
+  Don't make any single topic (e.g. Sports) a default or special case; all topics are optional,
+  user-added, and fully editable.
+- **Comments/docs in English.** UI strings are NOT hardcoded — add them to `UI` in `i18n.js`
+  for every language and reference via `t(lang,key)`; mark static markup with `data-i18n`.
+- New preset topics go in `presets.js` for **all** languages (keep `PRESET_CONTENT` ids aligned;
+  the logic test enforces this). Keep word lists conservative to avoid false positives.
 - Vanilla JS, no dependencies. Don't introduce a build step or npm packages.
-- Categories are fully editable, **including Sport** — don't reintroduce a read-only/builtin
-  special case.
 - The master toggle's checked state must come only from stored `enabled` (no hardcoded
   `checked` in HTML).
-- HTML inserted from data must go through `esc()` to avoid injection.
+- HTML inserted from data must go through `esc()` to avoid injection; preset/import colors are
+  restricted to hex.
 
 ## Testing / running
 

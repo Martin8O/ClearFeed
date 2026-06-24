@@ -1,34 +1,70 @@
 // =============================================
-//  ClearFeed — popup.js  (v1.4)
+//  ClearFeed — popup.js  (v2.0)
+//  Loads after i18n.js (UI strings) and presets.js (suggested topics).
 // =============================================
 
-// Sport is seeded from words.js (DEFAULT_SPORT_WORDS) on first run,
-// then becomes a normal editable category stored in chrome.storage.
-const DEFAULT_CATEGORIES = [
-  {
-    id: "sport",
-    name: "Sport",
-    enabled: true,
-    color: "#e74c3c",
-    words: (typeof DEFAULT_SPORT_WORDS !== "undefined") ? DEFAULT_SPORT_WORDS.slice() : []
-  }
-];
-
+const DEFAULT_CATEGORIES = []; // first run: no topics; user picks from suggestions
 const COLORS = ["#e74c3c","#e67e22","#f39c12","#27ae60","#2980b9","#8e44ad","#16a085","#c0392b"];
 
-let state = { enabled: true, blockedTotal: 0, categories: [], excludedSites: [] };
+let state = { enabled: true, blockedTotal: 0, categories: [], excludedSites: [], uiLang: "en" };
 
 // --- Init ---
-chrome.storage.local.get(["enabled","blockedTotal","categories","excludedSites"], (data) => {
+chrome.storage.local.get(["enabled","blockedTotal","categories","excludedSites","uiLang"], (data) => {
   state.enabled       = data.enabled !== false;
   state.blockedTotal  = data.blockedTotal || 0;
   state.categories    = data.categories  || DEFAULT_CATEGORIES;
   state.excludedSites = data.excludedSites || [];
+  state.uiLang        = pickLang(data.uiLang);
 
+  buildLangOptions();
+  applyI18n();
   document.getElementById("count").textContent = state.blockedTotal;
   setMasterToggle(state.enabled);
 
   renderCategories();
+  renderPresets();
+  renderExcluded();
+  refreshRevealButton();
+});
+
+function pickLang(stored) {
+  const codes = uiLangCodes();
+  if (stored && codes.includes(stored)) return stored;
+  const nav = (navigator.language || "en").slice(0, 2).toLowerCase();
+  return codes.includes(nav) ? nav : "en";
+}
+
+// --- i18n ---
+function tr(key) { return t(state.uiLang, key); }
+
+function applyI18n() {
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    el.textContent = tr(el.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-ph]").forEach((el) => {
+    el.placeholder = tr(el.dataset.i18nPh);
+  });
+  document.documentElement.lang = state.uiLang;
+}
+
+function buildLangOptions() {
+  const sel = document.getElementById("langSelect");
+  sel.innerHTML = "";
+  LANGS.forEach((l) => {
+    const o = document.createElement("option");
+    o.value = l.code; o.textContent = l.label;
+    sel.appendChild(o);
+  });
+  sel.value = state.uiLang;
+}
+
+document.getElementById("langSelect").addEventListener("change", (e) => {
+  state.uiLang = e.target.value;
+  saveSettings();
+  applyI18n();
+  setMasterToggle(state.enabled);     // refresh localized label
+  renderCategories();
+  renderPresets();
   renderExcluded();
   refreshRevealButton();
 });
@@ -37,7 +73,7 @@ chrome.storage.local.get(["enabled","blockedTotal","categories","excludedSites"]
 function setMasterToggle(enabled) {
   document.getElementById("masterToggle").checked = enabled;
   const label = document.getElementById("masterLabel");
-  label.textContent = enabled ? "Blocking active" : "Blocking paused";
+  label.textContent = enabled ? tr("blockingActive") : tr("blockingPaused");
   label.classList.toggle("off", !enabled);
 }
 
@@ -55,7 +91,7 @@ document.getElementById("resetBtn").addEventListener("click", () => {
   document.getElementById("count").textContent = "0";
 });
 
-// --- Add category ---
+// --- Add custom category ---
 document.getElementById("addCatBtn").addEventListener("click", () => {
   const input = document.getElementById("newCatName");
   const name = input.value.trim();
@@ -75,14 +111,49 @@ document.getElementById("newCatName").addEventListener("keydown", (e) => {
   if (e.key === "Enter") document.getElementById("addCatBtn").click();
 });
 
+// --- Suggested topic presets ---
+function renderPresets() {
+  const list = document.getElementById("presetList");
+  list.innerHTML = "";
+  const have = new Set(state.categories.map((c) => c.id));
+  const available = getPresets(state.uiLang).filter((p) => !have.has(presetCatId(p.id)));
+
+  if (available.length === 0) {
+    list.innerHTML = `<div class="preset-empty">${esc(tr("added"))} ✓</div>`;
+    return;
+  }
+  available.forEach((p) => {
+    const chip = document.createElement("button");
+    chip.className = "preset-chip";
+    chip.innerHTML = `<span class="pdot" style="background:${p.color}"></span>${esc(p.icon)} ${esc(p.name)} <span class="pplus">+</span>`;
+    chip.addEventListener("click", () => addPreset(p));
+    list.appendChild(chip);
+  });
+}
+
+function presetCatId(presetId) {
+  return `preset_${presetId}_${state.uiLang}`;
+}
+
+function addPreset(p) {
+  state.categories.push({
+    id: presetCatId(p.id),
+    name: p.name,
+    enabled: true,
+    color: p.color,
+    words: p.words.slice(),
+  });
+  saveSettings();
+  renderCategories();
+  renderPresets();
+  broadcastReload();
+}
+
 // --- Excluded sites ---
 document.getElementById("exclCurrentBtn").addEventListener("click", () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (!tabs[0] || !tabs[0].url) return;
-    try {
-      const host = new URL(tabs[0].url).hostname;
-      addExcluded(host);
-    } catch (e) {}
+    try { addExcluded(new URL(tabs[0].url).hostname); } catch (e) {}
   });
 });
 document.getElementById("addExclBtn").addEventListener("click", () => {
@@ -96,7 +167,7 @@ document.getElementById("newExclDomain").addEventListener("keydown", (e) => {
 
 function addExcluded(rawDomain) {
   const d = normalizeDomain(rawDomain);
-  if (!d || !d.includes(".")) return;        // simple validation
+  if (!d || !d.includes(".")) return;
   if (state.excludedSites.includes(d)) return;
   state.excludedSites.push(d);
   saveSettings();
@@ -115,6 +186,7 @@ function normalizeDomain(input) {
 function renderCategories() {
   const list = document.getElementById("catList");
   list.innerHTML = "";
+  document.getElementById("emptyCats").hidden = state.categories.length > 0;
 
   state.categories.forEach((cat) => {
     const card = document.createElement("div");
@@ -125,19 +197,19 @@ function renderCategories() {
       <div class="cat-header">
         <div class="cat-dot" style="background:${cat.color}"></div>
         <div class="cat-name">${esc(cat.name)}</div>
-        <span class="cat-count">${cat.words.length} words</span>
-        <label class="switch" title="Enable / disable category">
+        <span class="cat-count">${cat.words.length} ${esc(tr("words"))}</span>
+        <label class="switch" title="${esc(cat.name)}">
           <input type="checkbox" class="cat-toggle" ${cat.enabled ? "checked" : ""}/>
           <span class="slider"></span>
         </label>
         <span class="cat-chevron">▼</span>
       </div>
       <div class="cat-body">
-        <textarea class="words-area" placeholder="Separate words with commas or new lines…&#10;e.g. politics, election, government">${esc(cat.words.join(", "))}</textarea>
-        <p class="words-hint">A word stem is enough — "elect" catches election, elections, electoral…</p>
+        <textarea class="words-area" placeholder="${esc(tr("wordsPlaceholder"))}">${esc(cat.words.join(", "))}</textarea>
+        <p class="words-hint">${esc(tr("wordsHint"))}</p>
         <div class="cat-actions">
-          <button class="btn-save">Save <span class="saved-flash">✓</span></button>
-          <button class="btn-delete">🗑 Delete category</button>
+          <button class="btn-save">${esc(tr("save"))} <span class="saved-flash">✓</span></button>
+          <button class="btn-delete">🗑 ${esc(tr("deleteCat"))}</button>
         </div>
       </div>
     `;
@@ -154,9 +226,8 @@ function renderCategories() {
     });
 
     card.querySelector(".btn-save").addEventListener("click", () => {
-      const raw = card.querySelector(".words-area").value;
-      cat.words = parseWords(raw);
-      card.querySelector(".cat-count").textContent = `${cat.words.length} words`;
+      cat.words = parseWords(card.querySelector(".words-area").value);
+      card.querySelector(".cat-count").textContent = `${cat.words.length} ${tr("words")}`;
       saveSettings();
       broadcastReload();
       const flash = card.querySelector(".saved-flash");
@@ -165,11 +236,12 @@ function renderCategories() {
     });
 
     card.querySelector(".btn-delete").addEventListener("click", () => {
-      if (!confirm(`Delete the "${cat.name}" category?`)) return;
+      if (!confirm(fmt(tr("deleteConfirm"), { name: cat.name }))) return;
       state.categories = state.categories.filter((c) => c.id !== cat.id);
       saveSettings();
       broadcastReload();
       renderCategories();
+      renderPresets();
     });
 
     list.appendChild(card);
@@ -182,7 +254,7 @@ function renderExcluded() {
   list.innerHTML = "";
 
   if (state.excludedSites.length === 0) {
-    list.innerHTML = `<p class="excl-empty">None — blocking runs on every site.</p>`;
+    list.innerHTML = `<p class="excl-empty">${esc(tr("exclEmpty"))}</p>`;
     return;
   }
 
@@ -191,7 +263,7 @@ function renderExcluded() {
     row.className = "excl-row";
     row.innerHTML = `
       <span class="excl-domain">🚫 ${esc(domain)}</span>
-      <button class="excl-remove" title="Remove">✕</button>
+      <button class="excl-remove" title="✕">✕</button>
     `;
     row.querySelector(".excl-remove").addEventListener("click", () => {
       state.excludedSites.splice(idx, 1);
@@ -203,26 +275,11 @@ function renderExcluded() {
   });
 }
 
-// --- Helpers ---
-function parseWords(raw) {
-  return raw.split(/[\n,]+/).map((w) => w.trim().toLowerCase()).filter((w) => w.length > 1);
-}
-
-function saveSettings() {
-  chrome.storage.local.set({
-    enabled: state.enabled,
-    categories: state.categories,
-    excludedSites: state.excludedSites
-  });
-}
-
-// Reload every open tab, not just the active one, so a settings change takes
-// effect everywhere immediately. Tabs without the content script just reject
-// (caught). Tab ids are available without the "tabs" permission.
+// --- Reload every open tab, not just the active one ---
 function broadcastReload() {
   chrome.tabs.query({}, (tabs) => {
-    tabs.forEach((t) => {
-      if (t.id != null) chrome.tabs.sendMessage(t.id, { type: "RELOAD" }).catch(() => {});
+    tabs.forEach((tb) => {
+      if (tb.id != null) chrome.tabs.sendMessage(tb.id, { type: "RELOAD" }).catch(() => {});
     });
   });
 }
@@ -233,21 +290,18 @@ function withActiveTab(cb) {
   });
 }
 
-// --- Reveal hidden items on the current page (transparency) ---
+// --- Reveal hidden items on the current page ---
 function setRevealButton(count, revealed) {
   const btn = document.getElementById("revealBtn");
   if (!count) {
     btn.disabled = true;
     btn.classList.remove("active");
-    btn.textContent = "Nothing hidden on this page";
+    btn.textContent = tr("revealNothing");
     return;
   }
-  const plural = count > 1 ? "s" : "";
   btn.disabled = false;
   btn.classList.toggle("active", revealed);
-  btn.textContent = revealed
-    ? `Hide ${count} item${plural} again`
-    : `👁 Reveal ${count} hidden item${plural}`;
+  btn.textContent = revealed ? `${tr("hideAgain")} (${count})` : `👁 ${tr("reveal")} (${count})`;
 }
 
 function refreshRevealButton() {
@@ -278,21 +332,17 @@ function showBackup(text, cls) {
 
 document.getElementById("exportBtn").addEventListener("click", () => {
   const data = {
-    app: "ClearFeed", version: 1,
-    enabled: state.enabled,
-    categories: state.categories,
-    excludedSites: state.excludedSites
+    app: "ClearFeed", version: 2,
+    enabled: state.enabled, uiLang: state.uiLang,
+    categories: state.categories, excludedSites: state.excludedSites
   };
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url;
-  a.download = "clearfeed-settings.json";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  a.href = url; a.download = "clearfeed-settings.json";
+  document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
-  showBackup("Settings exported.", "ok");
+  showBackup(tr("exported"), "ok");
 });
 
 document.getElementById("importBtn").addEventListener("click", () => {
@@ -309,19 +359,23 @@ document.getElementById("importFile").addEventListener("change", (e) => {
       state.enabled = parsed.enabled;
       state.categories = parsed.categories;
       state.excludedSites = parsed.excludedSites;
+      if (parsed.uiLang) state.uiLang = parsed.uiLang;
       saveSettings();
+      buildLangOptions();
+      applyI18n();
       setMasterToggle(state.enabled);
       renderCategories();
+      renderPresets();
       renderExcluded();
       broadcastReload();
-      showBackup(`Imported ${state.categories.length} categories.`, "ok");
+      showBackup(fmt(tr("importedN"), { n: state.categories.length }), "ok");
     } catch (err) {
-      showBackup(err.message || "Import failed.", "err");
+      showBackup(tr("importFail"), "err");
     }
   };
-  reader.onerror = () => showBackup("Could not read file.", "err");
+  reader.onerror = () => showBackup(tr("importFail"), "err");
   reader.readAsText(file);
-  e.target.value = ""; // allow re-importing the same file
+  e.target.value = "";
 });
 
 // Validate + normalize an imported settings object. Throws on invalid input.
@@ -350,7 +404,23 @@ function sanitizeSettings(obj) {
   const excludedSites = Array.isArray(obj.excludedSites)
     ? obj.excludedSites.map((d) => String(d).toLowerCase().trim()).filter(Boolean)
     : [];
-  return { enabled: obj.enabled !== false, categories, excludedSites };
+  const uiLang = (typeof obj.uiLang === "string" && uiLangCodes().includes(obj.uiLang))
+    ? obj.uiLang : undefined;
+  return { enabled: obj.enabled !== false, categories, excludedSites, uiLang };
+}
+
+// --- Helpers ---
+function parseWords(raw) {
+  return raw.split(/[\n,]+/).map((w) => w.trim().toLowerCase()).filter((w) => w.length > 1);
+}
+
+function saveSettings() {
+  chrome.storage.local.set({
+    enabled: state.enabled,
+    uiLang: state.uiLang,
+    categories: state.categories,
+    excludedSites: state.excludedSites
+  });
 }
 
 function esc(str) {

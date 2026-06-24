@@ -10,45 +10,49 @@ alongside this file in `store/`.
 **Item name**
 
 ```
-ClearFeed — Hide Sports & Unwanted News
+ClearFeed — Clean Your News Feed
 ```
 
 **Summary** (max 132 chars)
 
 ```
-Hide sports — or any keywords you choose — from news sites and feeds. Private by design: no tracking, no servers, all local.
+Mute topics you'd rather not see — politics, gossip, spoilers, sports or any keywords. Private by design: no tracking, all local.
 ```
 
 **Category:** Productivity
-**Language:** English
+**Language:** English (UI also available in Español, Deutsch, Français)
 
 **Detailed description**
 
 ```
-ClearFeed quietly removes the topics you don't want to see from news sites and feeds.
+ClearFeed helps you focus on what matters. It quietly hides the topics you'd rather not see
+from news sites and feeds — so your reading stays calm and relevant. You're always in control:
+nothing is hidden unless you ask for it.
 
-Tired of sports dominating every front page? Turn it off. ClearFeed ships with a Sport
-category and lets you create your own — politics, a specific team, a celebrity, spoilers,
-anything — then hides every article, card, and feed item that matches.
+★ PICK YOUR TOPICS
+Add ready-made topics with one click — Politics, Celebrity gossip, Crime & disasters,
+Money & crypto, Spoilers, Sports — each with a built-in keyword list. Or create your own
+from any keywords. Every topic is fully editable, and a word stem is enough: "elect" catches
+election, elections, electoral…
 
-★ FEATURES
-• Category-based blocking — start with Sport, add as many of your own as you like.
-• Fully editable word lists — every category, including Sport, is editable. A word stem is
-  enough: "elect" catches election, elections, electoral…
-• Per-category and master on/off switches.
-• Excluded sites — never block on your bank, e-mail, or any site you choose. One click
-  excludes the site you're currently on.
-• Live counter of how many articles it has hidden for you.
+★ WORKS IN YOUR LANGUAGE
+Switch the app and its suggested word lists between English, Español, Deutsch and Français,
+so filtering works on your local news too.
+
+★ YOU STAY IN CONTROL
+• Per-topic and master on/off switches.
+• "Reveal hidden" shows exactly what was filtered on a page — nothing happens behind your back.
+• Excluded sites — never filter on your bank, e-mail, or any site you choose.
+• Backup and restore your setup as a file.
 
 ★ PRIVATE BY DESIGN
 • Zero network requests — nothing you read ever leaves your device.
 • No tracking, no analytics, no accounts, no ads.
 • Settings are stored locally in your browser only.
-• Open source and auditable — and a safety test fails the build if any network or
-  remote-code call is ever added: https://github.com/Martin8O/ClearFeed
+• Open source and auditable — a safety test fails the build if any network or remote-code
+  call is ever added: https://github.com/Martin8O/ClearFeed
 
-ClearFeed reads page text locally to find and hide matches — that text is never stored or
-sent anywhere. It's free, lightweight, and has no dependencies.
+Free, lightweight, no dependencies.
 ```
 
 ---
@@ -59,8 +63,8 @@ sent anywhere. It's free, lightweight, and has no dependencies.
 
 ```
 ClearFeed has one purpose: to hide articles and feed items on web pages that match
-user-defined keyword categories, so the user can remove unwanted topics (such as sports)
-from the sites they browse.
+user-defined keyword topics, so the user can keep topics they'd rather not see (such as
+politics, gossip, or spoilers) out of the sites they browse.
 ```
 
 **Permission justifications**

@@ -3,6 +3,24 @@
 All notable changes to ClearFeed are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.0] - 2026-06-24
+
+### Changed
+- **Rebrand to a welcoming, topic-neutral product.** ClearFeed is now about *focusing your
+  feed*, not blocking one thing. **Sports is no longer a default** — on first run nothing is
+  filtered until you choose.
+- New tagline and description: "Clean your feed. Focus on what matters to you."
+
+### Added
+- **Suggested-topic library** — one-click topics, each seeded with a keyword list: Sports,
+  Politics, Celebrity gossip, Crime & disasters, Money & crypto, Spoilers. Add your own too.
+- **Multi-language UI + word lists** — switch the app between **English, Español, Deutsch,
+  Français** at runtime; seeded topic words are localized so filtering works on local news.
+- Empty-state guidance when no topics are selected yet.
+
+### Removed
+- `words.js` (the fixed Sport seed list); replaced by `presets.js` + `i18n.js`.
+
 ## [1.5] - 2026-06-24
 
 ### Added

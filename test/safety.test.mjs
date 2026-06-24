@@ -13,7 +13,7 @@ const ROOT = path.dirname(path.dirname(url.fileURLToPath(import.meta.url)));
 // because that's where a network call or remote-code execution could live.
 // manifest.json is metadata (its homepage_url is benign) and is checked
 // separately for permission scope below.
-const CODE_FILES = ["content.js", "popup.js", "words.js", "popup.html"];
+const CODE_FILES = ["content.js", "popup.js", "i18n.js", "presets.js", "popup.html"];
 
 // Each forbidden pattern => human-readable reason.
 const FORBIDDEN = [
