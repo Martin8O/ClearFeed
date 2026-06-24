@@ -1,5 +1,5 @@
 // =============================================
-//  ClearFeed — content.js  (v1.4)
+//  ClearFeed — content.js  (v1.5)
 //  Behaviour:
 //   - Respects the list of EXCLUDED sites (banking,
 //     e-mail…) → no scanning happens there.
@@ -7,6 +7,8 @@
 //     counter, word boundaries.
 //   - Every category (including Sport) is driven by its
 //     own editable word list stored in chrome.storage.
+//   - Supports a temporary "reveal hidden" mode toggled
+//     from the popup (transparency).
 // =============================================
 
 const ARTICLE_SELECTORS = [
@@ -39,6 +41,7 @@ let activeMatchers = [];
 let blockedCount = 0;
 let observer = null;
 let debounceTimer = null;
+let revealMode = false;
 const sessionCounted = new Set();
 
 // --------- Excluded sites ---------
@@ -101,22 +104,23 @@ function loadAndScan() {
 
 // --------- Main scan ---------
 function scanAndBlock() {
+  if (revealMode) return; // don't re-hide while the user is reviewing
   const candidates = findArticleElements();
 
   const newMatches = [];
   candidates.forEach((el) => {
-    if (el.dataset.sportBlocked) return;
-    if (el.dataset.sbSeen) return;
+    if (el.dataset.cfBlocked) return;
+    if (el.dataset.cfSeen) return;
     if (containsBlockedWord(getTextContent(el))) {
       newMatches.push(el);
     } else {
-      el.dataset.sbSeen = "1";
+      el.dataset.cfSeen = "1";
     }
   });
 
   if (newMatches.length === 0) return;
 
-  const alreadyBlocked = Array.from(document.querySelectorAll("[data-sport-blocked]"));
+  const alreadyBlocked = Array.from(document.querySelectorAll("[data-cf-blocked]"));
 
   let addedToCount = 0;
   newMatches.forEach((el) => {
@@ -138,17 +142,44 @@ function scanAndBlock() {
 
 // --------- Hide / unhide ---------
 function hideElement(el) {
-  el.dataset.sbPrevDisplay = el.style.getPropertyValue("display");
+  el.dataset.cfPrevDisplay = el.style.getPropertyValue("display");
   el.style.setProperty("display", "none", "important");
-  el.dataset.sportBlocked = "1";
+  el.dataset.cfBlocked = "1";
 }
 
 function unhideElement(el) {
-  const prev = el.dataset.sbPrevDisplay || "";
+  const prev = el.dataset.cfPrevDisplay || "";
   if (prev) el.style.setProperty("display", prev);
   else el.style.removeProperty("display");
-  delete el.dataset.sbPrevDisplay;
-  delete el.dataset.sportBlocked;
+  el.style.removeProperty("outline");
+  delete el.dataset.cfPrevDisplay;
+  delete el.dataset.cfBlocked;
+  delete el.dataset.cfRevealed;
+}
+
+// --------- Reveal mode (transparency) ---------
+function hiddenCount() {
+  return document.querySelectorAll("[data-cf-blocked]").length;
+}
+
+function setRevealMode(on) {
+  revealMode = on;
+  document.querySelectorAll("[data-cf-blocked]").forEach((el) => {
+    if (on) {
+      const prev = el.dataset.cfPrevDisplay || "";
+      if (prev) el.style.setProperty("display", prev);
+      else el.style.removeProperty("display");
+      el.style.setProperty("outline", "2px dashed #7c83fd", "important");
+      el.style.setProperty("outline-offset", "-2px", "important");
+      el.dataset.cfRevealed = "1";
+    } else {
+      el.style.setProperty("display", "none", "important");
+      el.style.removeProperty("outline");
+      el.style.removeProperty("outline-offset");
+      delete el.dataset.cfRevealed;
+    }
+  });
+  return hiddenCount();
 }
 
 // --------- Counter ---------
@@ -199,12 +230,23 @@ function watchDynamicContent() {
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
-// --------- React to settings changes from the popup ---------
-chrome.runtime.onMessage.addListener((msg) => {
+// --------- React to messages from the popup ---------
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === "RELOAD") {
-    document.querySelectorAll("[data-sport-blocked]").forEach(unhideElement);
-    document.querySelectorAll("[data-sb-seen]").forEach((el) => delete el.dataset.sbSeen);
+    revealMode = false;
+    document.querySelectorAll("[data-cf-blocked]").forEach(unhideElement);
+    document.querySelectorAll("[data-cf-seen]").forEach((el) => delete el.dataset.cfSeen);
     loadAndScan();
+    return;
+  }
+  if (msg.type === "GET_HIDDEN_STATE") {
+    sendResponse({ count: hiddenCount(), revealed: revealMode });
+    return;
+  }
+  if (msg.type === "TOGGLE_REVEAL") {
+    const count = setRevealMode(!revealMode);
+    sendResponse({ count, revealed: revealMode });
+    return;
   }
 });
 

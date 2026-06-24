@@ -10,3 +10,6 @@ Thumbs.db
 *.crx
 *.pem
 node_modules/
+
+# Local working area (assistant notes, dev history, roadmap) — never committed
+.local/

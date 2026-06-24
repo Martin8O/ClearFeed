@@ -30,6 +30,7 @@ chrome.storage.local.get(["enabled","blockedTotal","categories","excludedSites"]
 
   renderCategories();
   renderExcluded();
+  refreshRevealButton();
 });
 
 // --- Master toggle ---
@@ -215,12 +216,141 @@ function saveSettings() {
   });
 }
 
+// Reload every open tab, not just the active one, so a settings change takes
+// effect everywhere immediately. Tabs without the content script just reject
+// (caught). Tab ids are available without the "tabs" permission.
 function broadcastReload() {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs[0]) {
-      chrome.tabs.sendMessage(tabs[0].id, { type: "RELOAD" }).catch(() => {});
-    }
+  chrome.tabs.query({}, (tabs) => {
+    tabs.forEach((t) => {
+      if (t.id != null) chrome.tabs.sendMessage(t.id, { type: "RELOAD" }).catch(() => {});
+    });
   });
+}
+
+function withActiveTab(cb) {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0] && tabs[0].id != null) cb(tabs[0].id);
+  });
+}
+
+// --- Reveal hidden items on the current page (transparency) ---
+function setRevealButton(count, revealed) {
+  const btn = document.getElementById("revealBtn");
+  if (!count) {
+    btn.disabled = true;
+    btn.classList.remove("active");
+    btn.textContent = "Nothing hidden on this page";
+    return;
+  }
+  const plural = count > 1 ? "s" : "";
+  btn.disabled = false;
+  btn.classList.toggle("active", revealed);
+  btn.textContent = revealed
+    ? `Hide ${count} item${plural} again`
+    : `👁 Reveal ${count} hidden item${plural}`;
+}
+
+function refreshRevealButton() {
+  withActiveTab((tabId) => {
+    chrome.tabs.sendMessage(tabId, { type: "GET_HIDDEN_STATE" }, (resp) => {
+      if (chrome.runtime.lastError || !resp) { setRevealButton(0, false); return; }
+      setRevealButton(resp.count, resp.revealed);
+    });
+  });
+}
+
+document.getElementById("revealBtn").addEventListener("click", () => {
+  withActiveTab((tabId) => {
+    chrome.tabs.sendMessage(tabId, { type: "TOGGLE_REVEAL" }, (resp) => {
+      if (chrome.runtime.lastError || !resp) return;
+      setRevealButton(resp.count, resp.revealed);
+    });
+  });
+});
+
+// --- Backup: export / import settings ---
+function showBackup(text, cls) {
+  const el = document.getElementById("backupMsg");
+  el.textContent = text;
+  el.className = "backup-msg " + (cls || "");
+  setTimeout(() => { el.textContent = ""; el.className = "backup-msg"; }, 4000);
+}
+
+document.getElementById("exportBtn").addEventListener("click", () => {
+  const data = {
+    app: "ClearFeed", version: 1,
+    enabled: state.enabled,
+    categories: state.categories,
+    excludedSites: state.excludedSites
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "clearfeed-settings.json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showBackup("Settings exported.", "ok");
+});
+
+document.getElementById("importBtn").addEventListener("click", () => {
+  document.getElementById("importFile").click();
+});
+
+document.getElementById("importFile").addEventListener("change", (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = sanitizeSettings(JSON.parse(reader.result));
+      state.enabled = parsed.enabled;
+      state.categories = parsed.categories;
+      state.excludedSites = parsed.excludedSites;
+      saveSettings();
+      setMasterToggle(state.enabled);
+      renderCategories();
+      renderExcluded();
+      broadcastReload();
+      showBackup(`Imported ${state.categories.length} categories.`, "ok");
+    } catch (err) {
+      showBackup(err.message || "Import failed.", "err");
+    }
+  };
+  reader.onerror = () => showBackup("Could not read file.", "err");
+  reader.readAsText(file);
+  e.target.value = ""; // allow re-importing the same file
+});
+
+// Validate + normalize an imported settings object. Throws on invalid input.
+// Colors are restricted to hex so they can't break out of the inline style.
+function sanitizeSettings(obj) {
+  if (!obj || typeof obj !== "object" || Array.isArray(obj)) {
+    throw new Error("Not a valid settings file.");
+  }
+  if (!Array.isArray(obj.categories)) {
+    throw new Error("Settings file has no categories.");
+  }
+  const categories = obj.categories.map((c, i) => {
+    if (!c || typeof c !== "object") throw new Error("Invalid category in file.");
+    const color = (typeof c.color === "string" && /^#[0-9a-fA-F]{3,8}$/.test(c.color))
+      ? c.color : "#888888";
+    return {
+      id: (typeof c.id === "string" && c.id) ? c.id : "cat_" + i,
+      name: String(c.name == null ? "Unnamed" : c.name).slice(0, 40),
+      enabled: c.enabled !== false,
+      color,
+      words: Array.isArray(c.words)
+        ? c.words.map((w) => String(w).toLowerCase().trim()).filter((w) => w.length > 1)
+        : []
+    };
+  });
+  const excludedSites = Array.isArray(obj.excludedSites)
+    ? obj.excludedSites.map((d) => String(d).toLowerCase().trim()).filter(Boolean)
+    : [];
+  return { enabled: obj.enabled !== false, categories, excludedSites };
 }
 
 function esc(str) {

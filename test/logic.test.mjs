@@ -55,3 +55,31 @@ test("esc neutralizes HTML-significant characters", () => {
     "&lt;img src=x onerror=&quot;alert(&#39;x&#39;)&quot;&gt;");
   assert.equal(popup.esc("a & b"), "a &amp; b");
 });
+
+test("sanitizeSettings normalizes a valid backup", () => {
+  const out = popup.sanitizeSettings({
+    enabled: false,
+    categories: [{ id: "sport", name: "Sport", enabled: true, color: "#e74c3c", words: ["NHL", "a", " Goal "] }],
+    excludedSites: [" MyBank.com ", ""],
+  });
+  assert.equal(out.enabled, false);
+  assert.equal(out.categories.length, 1);
+  assert.deepEqual(Array.from(out.categories[0].words), ["nhl", "goal"]); // lowercased, 1-char dropped
+  assert.deepEqual(Array.from(out.excludedSites), ["mybank.com"]);
+});
+
+test("sanitizeSettings rejects malicious color and fills defaults", () => {
+  const out = popup.sanitizeSettings({ categories: [{ words: [] }] });
+  assert.equal(out.enabled, true, "missing enabled defaults to true");
+  assert.equal(out.categories[0].color, "#888888");
+  assert.equal(out.categories[0].name, "Unnamed");
+  // a color that tries to break out of the inline style must be discarded
+  const evil = popup.sanitizeSettings({ categories: [{ color: 'red;"></div><script>', words: [] }] });
+  assert.equal(evil.categories[0].color, "#888888");
+});
+
+test("sanitizeSettings throws on invalid input", () => {
+  assert.throws(() => popup.sanitizeSettings(null));
+  assert.throws(() => popup.sanitizeSettings([]));
+  assert.throws(() => popup.sanitizeSettings({ foo: 1 }), /no categories/);
+});

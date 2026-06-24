@@ -19,6 +19,8 @@ A lightweight Chrome extension (Manifest V3) that hides unwanted content — spo
 - **Per-category on/off** toggles, plus a master switch to pause all blocking.
 - **Excluded sites.** Add domains (banking, e-mail, …) where blocking should never run — one click excludes the site you're currently on.
 - **Hidden-article counter** so you can see how much noise it filters out.
+- **Reveal hidden items** — one click temporarily shows what was hidden on the current page (outlined), then re-hides it, so nothing happens behind your back.
+- **Settings backup** — export your categories and excluded sites to a JSON file and import them on another machine.
 - **Word-boundary matching** so short words won't match inside unrelated words.
 
 ## How it works

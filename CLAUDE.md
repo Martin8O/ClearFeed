@@ -56,9 +56,15 @@ Two execution contexts that communicate through `chrome.storage.local` and runti
 
 ### Popup ↔ content messaging
 
-- Popup → active tab: `{ type: "RELOAD" }` after any settings change. The content script
-  un-hides everything, clears its "seen" markers, and re-scans.
+- Popup → **all tabs**: `{ type: "RELOAD" }` after any settings change. The content script
+  un-hides everything, clears its "seen" markers, resets reveal mode, and re-scans.
+- Popup → active tab: `{ type: "GET_HIDDEN_STATE" }` / `{ type: "TOGGLE_REVEAL" }` for the
+  "reveal hidden items" button; the content script responds with `{ count, revealed }`.
 - Content → popup: `{ type: "COUNT_UPDATE", count }` to update the live counter.
+
+Hidden elements are marked `data-cf-blocked` (and `data-cf-revealed` while temporarily shown);
+scanned-but-clean elements get `data-cf-seen`. Settings import is validated/normalized by
+`sanitizeSettings()` in `popup.js` (restricts category color to hex to keep `innerHTML` safe).
 
 ## Conventions
 

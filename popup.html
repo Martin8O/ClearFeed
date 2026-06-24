@@ -137,6 +137,29 @@
 
     .saved-flash { font-size: 11px; color: #2ecc71; margin-left: 6px; opacity: 0; transition: opacity .3s; }
     .saved-flash.show { opacity: 1; }
+
+    /* REVEAL ON PAGE */
+    .page-row { background: #fff; border-bottom: 1px solid #eee; padding: 8px 16px; }
+    .btn-reveal {
+      width: 100%; background: #fff; border: 1px solid #e0e0ea; border-radius: 8px;
+      padding: 8px; font-size: 12px; font-weight: 500; color: #4a4a6a; cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-reveal:hover:not(:disabled) { background: #f0f0fa; border-color: #7c83fd; }
+    .btn-reveal:disabled { color: #bbb; cursor: default; }
+    .btn-reveal.active { background: #eef0ff; border-color: #7c83fd; color: #3a3a6a; }
+
+    /* BACKUP */
+    .backup-section { padding: 4px 10px 16px; }
+    .backup-row { display: flex; gap: 6px; }
+    .btn-backup {
+      flex: 1; background: #fff; border: 1px solid #e0e0ea; border-radius: 6px;
+      padding: 8px; font-size: 12px; font-weight: 500; color: #4a4a6a; cursor: pointer;
+    }
+    .btn-backup:hover { background: #f0f0fa; border-color: #7c83fd; color: #1a1a2e; }
+    .backup-msg { font-size: 11px; margin-top: 6px; min-height: 14px; }
+    .backup-msg.ok { color: #2ecc71; }
+    .backup-msg.err { color: #e74c3c; }
   </style>
 </head>
 <body>
@@ -162,6 +185,10 @@
   </label>
 </div>
 
+<div class="page-row">
+  <button class="btn-reveal" id="revealBtn" disabled>Nothing hidden on this page</button>
+</div>
+
 <div class="section-header">Categories</div>
 <div class="cat-list" id="catList"></div>
 
@@ -181,6 +208,16 @@
     <input type="text" class="add-name-input" id="newExclDomain" placeholder="e.g. mybank.com" maxlength="80"/>
     <button class="btn-add" id="addExclBtn">+ Add</button>
   </div>
+</div>
+
+<div class="section-header">Backup</div>
+<div class="backup-section">
+  <div class="backup-row">
+    <button class="btn-backup" id="exportBtn">⬇ Export settings</button>
+    <button class="btn-backup" id="importBtn">⬆ Import settings</button>
+  </div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden/>
+  <div class="backup-msg" id="backupMsg"></div>
 </div>
 
 <script src="words.js"></script>

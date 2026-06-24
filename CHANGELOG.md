@@ -3,6 +3,18 @@
 All notable changes to ClearFeed are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.5] - 2026-06-24
+
+### Added
+- **Settings backup** — export your categories and excluded sites to a JSON file and import
+  them back (with validation). Useful since storage is local-only by design.
+- **Reveal hidden items** — a popup button temporarily shows what ClearFeed hid on the current
+  page (with a dashed outline), then re-hides them, for full transparency.
+
+### Changed
+- Settings changes now apply to **all open tabs** immediately, not just the active one.
+- Renamed internal `data-sport-*` element markers to `data-cf-*` (ClearFeed namespace).
+
 ## [1.4] - 2026-06-24
 
 ### Changed
