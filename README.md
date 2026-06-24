@@ -7,10 +7,7 @@
 
 A lightweight Chrome extension (Manifest V3) that hides unwanted content — sports by default, or **any words you choose** — from news sites and feeds.
 
-<!-- Demo recording — see assets/README.md for how to capture it.
-![ClearFeed demo](assets/demo.gif)
--->
-> 📹 _Demo GIF coming soon — see [assets/README.md](assets/README.md) for how it's captured._
+![ClearFeed demo — sports articles disappearing from a news feed](assets/demo.gif)
 
 ## Features
 

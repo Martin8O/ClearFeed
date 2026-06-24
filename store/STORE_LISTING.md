@@ -96,11 +96,13 @@ https://github.com/Martin8O/ClearFeed/blob/main/PRIVACY.md
 | Store icon | 128×128 PNG | ✅ `icon128.png` |
 | Small promo tile | 440×280 PNG | ✅ `store/promo-small-440x280.png` |
 | Marquee promo | 1400×560 PNG | ✅ `store/marquee-1400x560.png` |
-| Screenshots | 1280×800 (or 640×400), 1–5 | ⬜ **capture from the live popup + a before/after on a news site** |
+| Screenshots | 1280×800, 1–5 | ✅ `store/screenshots/01-popup.png`, `02-before-after.png`, `03-reveal.png` |
 
-> Screenshots must show the real UI, so they have to be captured from the running extension
-> (Load unpacked → open the popup; and a news page before/after blocking). Recommended set:
-> (1) the popup with a few categories, (2) a news feed before, (3) the same feed after.
+> The popup screenshot (`01-popup.png`) is rendered from the **real** `popup.html` + `popup.js`
+> (seeded with sample data via headless Chrome), so it reflects the actual UI. The before/after
+> and reveal screenshots use a representative news-feed mock to illustrate behavior. If you want
+> screenshots captured against a specific real news site, do a quick manual capture once the
+> extension is loaded unpacked and drop them in `store/screenshots/`.
 
 ---
 
