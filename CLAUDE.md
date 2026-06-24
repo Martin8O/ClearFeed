@@ -72,7 +72,16 @@ Two execution contexts that communicate through `chrome.storage.local` and runti
 
 ## Testing / running
 
-No automated tests. To verify changes:
+Automated tests use Node's built-in runner (zero dependencies), run with `node --test`
+and in CI (`.github/workflows/ci.yml`):
+
+- `test/safety.test.mjs` — static audit; fails if shipped code gains network/eval/remote-code
+  patterns or unexpected permissions. **Keep this green — it backs the privacy claims.**
+- `test/logic.test.mjs` — exercises the real pure logic (matching, domain/word parsing, `esc`)
+  by loading source in a VM sandbox (`test/harness.mjs`) with stubbed `chrome`/DOM globals.
+- Cross-realm note: arrays returned from the sandbox need `Array.from(...)` before deep-equal.
+
+To verify in the browser:
 
 1. `chrome://extensions` → **Developer mode** → **Load unpacked** → select this folder.
 2. After editing, click the reload icon on the extension card, then reload the target page.

@@ -1,0 +1,10 @@
+{
+  "name": "clearfeed",
+  "version": "1.4.0",
+  "private": true,
+  "description": "Chrome extension that hides sports — or any words you choose — from news feeds.",
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "MIT"
+}
