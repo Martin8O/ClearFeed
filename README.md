@@ -1,5 +1,7 @@
 # ClearFeed
 
+![ClearFeed — mute the topics you'd rather not see](assets/banner.png)
+
 [![CI](https://github.com/Martin8O/ClearFeed/actions/workflows/ci.yml/badge.svg)](https://github.com/Martin8O/ClearFeed/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![No network calls](https://img.shields.io/badge/network%20requests-zero-brightgreen.svg)](SECURITY.md#automated-safety-checks)
