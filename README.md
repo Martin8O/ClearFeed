@@ -15,6 +15,10 @@
 
 ![Before and after — a news feed with sports and politics articles hidden by ClearFeed](assets/before-after.png)
 
+**Your control panel** — the popup is where you pick topics, watch the hidden-items counter, pause filtering, switch theme or language, and exclude the current site:
+
+<img src="assets/popup.png" alt="ClearFeed popup — topics with on/off toggles, a hidden-items counter, suggested topics, and a master pause switch" width="320">
+
 ## Features
 
 - **Pick your topics.** Start from one-click **suggested topics** (Politics, Celebrity gossip, Crime & disasters, Money & crypto, Spoilers, Sports) or add your own — each comes with a ready-made keyword list.
