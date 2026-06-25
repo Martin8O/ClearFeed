@@ -30,10 +30,12 @@ Two execution contexts that communicate through `chrome.storage.local` and runti
 | `manifest.json` | MV3 manifest. Bump `version` here on release. |
 | `i18n.js` | `UI` strings + `LANGS` + `t(lang,key)` / `fmt()`. Loaded before `popup.js`. |
 | `presets.js` | Suggested topics: `PRESET_META` + per-language `PRESET_CONTENT`; `getPresets(lang)`. Loaded before `popup.js`. |
+| `background.js` | Service worker. Handles the `toggle-blocking` keyboard command (flip `enabled`, broadcast `RELOAD`) and swaps the toolbar icon to the greyed `-off` variant whenever `enabled` is false. |
 | `content.js` | Page scanner: builds regex matchers, hides matching elements, counts them, watches dynamic content, reveal mode. |
 | `popup.js` | Settings UI logic: topics, suggested presets, language switch, excluded sites, master toggle, counter, backup. |
 | `popup.html` | Popup markup + CSS (inline `<style>`); text marked with `data-i18n`/`data-i18n-ph`. |
 | `icon16/48/128.png` | Toolbar/store icons. Regenerate with the PIL script (see below). |
+| `icon16/48/128-off.png` | Greyed "filtering off" icons with a red slash; set by `background.js` via `chrome.action.setIcon` when `enabled` is false. Derived from the base icons with PIL. |
 
 ### Data model (in `chrome.storage.local`)
 

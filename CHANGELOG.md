@@ -3,6 +3,19 @@
 All notable changes to ClearFeed are documented here.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
+## [2.5] - 2026-06-25
+
+### Added
+- **Keyboard shortcut** to turn filtering on/off without opening the popup
+  (default `Ctrl+Shift+F`, `⌘+Shift+F` on Mac). Handled by a minimal background
+  service worker that flips the master state and re-scans open tabs.
+- "Set keyboard shortcut" link in the About panel, opening Chrome's shortcut
+  manager so users can rebind or clear the key. Localized in all 16 languages.
+- **Toolbar icon now reflects state** — when filtering is off the icon turns
+  greyed-out with a red slash, so on/off is visible at a glance without opening
+  the popup. Updated from the background worker on every state change.
+- `CONTRIBUTING.md` with the project's no-dependency / privacy / all-languages rules.
+
 ## [2.3] - 2026-06-24
 
 ### Added

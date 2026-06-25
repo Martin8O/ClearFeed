@@ -99,6 +99,7 @@ document.getElementById("aboutClose").addEventListener("click", () => {
 });
 document.getElementById("aboutGithub").addEventListener("click", () => openUrl(REPO_URL));
 document.getElementById("aboutPrivacy").addEventListener("click", () => openUrl(REPO_URL + "/blob/main/PRIVACY.md"));
+document.getElementById("aboutShortcut").addEventListener("click", () => openUrl("chrome://extensions/shortcuts"));
 document.getElementById("coffeeBtn").addEventListener("click", () => openUrl(COFFEE_URL));
 document.getElementById("aboutCoffee").addEventListener("click", () => openUrl(COFFEE_URL));
 

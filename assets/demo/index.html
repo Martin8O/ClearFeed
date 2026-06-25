@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>DailyNews — your feed</title>
+<style>
+  :root { --bg:#f4f5f8; --card:#fff; --text:#1a1c23; --muted:#6b7280; --line:#e7e8ee;
+          --brand:#5b62e6; --shadow:0 1px 3px rgba(20,22,40,.08),0 6px 18px rgba(20,22,40,.06); }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+         font:15px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+  header { background:var(--card); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:5; }
+  .bar { max-width:1080px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:18px; }
+  .logo { font-size:20px; font-weight:800; letter-spacing:-.4px; }
+  .logo span { color:var(--brand); }
+  nav { display:flex; gap:18px; color:var(--muted); font-size:14px; font-weight:600; }
+  nav a { color:inherit; text-decoration:none; }
+  nav a:hover { color:var(--text); }
+  main { max-width:1080px; margin:0 auto; padding:26px 24px 60px; }
+  h1.section { font-size:13px; text-transform:uppercase; letter-spacing:.10em; color:var(--muted);
+               margin:8px 0 18px; font-weight:700; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden;
+          box-shadow:var(--shadow); display:flex; flex-direction:column; }
+  .thumb { height:120px; background:linear-gradient(135deg,#c9ccf5,#9aa0ee); }
+  .thumb.t-world{background:linear-gradient(135deg,#a7d3ff,#5b8def);}
+  .thumb.t-sport{background:linear-gradient(135deg,#ffc1c1,#ef5b5b);}
+  .thumb.t-econ {background:linear-gradient(135deg,#bff0c8,#3fbf63);}
+  .thumb.t-tech {background:linear-gradient(135deg,#e0c1ff,#9b5bef);}
+  .thumb.t-pol  {background:linear-gradient(135deg,#ffd9a8,#ef9b3f);}
+  .body { padding:14px 16px 18px; }
+  .tag { display:inline-block; font-size:10px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
+         color:#fff; padding:3px 8px; border-radius:6px; margin-bottom:10px; }
+  .tag.world{background:#3f7fef;} .tag.sport{background:#ef4444;} .tag.econ{background:#22a04a;}
+  .tag.tech{background:#8b3fef;} .tag.pol{background:#e08020;}
+  .card h2 { font-size:16px; line-height:1.3; margin:0 0 6px; }
+  .card p { margin:0; color:var(--muted); font-size:13px; }
+  .meta { margin-top:12px; font-size:12px; color:#9aa0ad; }
+  @media (max-width:880px){ .grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="logo">Daily<span>News</span></div>
+    <nav><a>Home</a><a>World</a><a>Business</a><a>Sport</a><a>Tech</a><a>Politics</a></nav>
+  </div>
+</header>
+
+<main>
+  <h1 class="section">Your feed — everything, everywhere</h1>
+  <div class="grid">
+
+    <article class="card">
+      <div class="thumb t-world"></div>
+      <div class="body"><span class="tag world">World</span>
+        <h2>New climate accord signed by 40 nations</h2>
+        <p>Delegates reached a late-night agreement after two weeks of talks.</p>
+        <div class="meta">World · 2h ago</div></div>
+    </article>
+
+    <article class="card">
+      <div class="thumb t-sport"></div>
+      <div class="body"><span class="tag sport">Sport</span>
+        <h2>Football: late goal seals the title</h2>
+        <p>Champions League night ends in dramatic fashion at the stadium.</p>
+        <div class="meta">Sport · 3h ago</div></div>
+    </article>
+
+    <article class="card">
+      <div class="thumb t-econ"></div>
+      <div class="body"><span class="tag econ">Economy</span>
+        <h2>Inflation cools for the third straight month</h2>
+        <p>Analysts say the trend could ease pressure on interest rates.</p>
+        <div class="meta">Business · 4h ago</div></div>
+    </article>
+
+    <article class="card">
+      <div class="thumb t-sport"></div>
+      <div class="body"><span class="tag sport">Sport</span>
+        <h2>NHL playoff race tightens in final week</h2>
+        <p>Three teams separated by a single point heading into the weekend.</p>
+        <div class="meta">Sport · 5h ago</div></div>
+    </article>
+
+    <article class="card">
+      <div class="thumb t-tech"></div>
+      <div class="body"><span class="tag tech">Tech</span>
+        <h2>Open-source browser tools see record adoption</h2>
+        <p>Developers cite privacy and transparency as key drivers.</p>
+        <div class="meta">Tech · 6h ago</div></div>
+    </article>
+
+    <article class="card">
+      <div class="thumb t-sport"></div>
+      <div class="body"><span class="tag sport">Sport</span>
+        <h2>Wimbledon tennis: top seed cruises into final</h2>
+        <p>A commanding serve carried the tennis match in straight sets.</p>
+        <div class="meta">Sport · 7h ago</div></div>
+    </article>
+
+    <article class="card">
+      <div class="thumb t-pol"></div>
+      <div class="body"><span class="tag pol">Politics</span>
+        <h2>Parliament debates new budget proposal</h2>
+        <p>Lawmakers spar over spending priorities ahead of the vote.</p>
+        <div class="meta">Politics · 8h ago</div></div>
+    </article>
+
+    <article class="card">
+      <div class="thumb t-world"></div>
+      <div class="body"><span class="tag world">World</span>
+        <h2>Coastal cities test new flood defenses</h2>
+        <p>Engineers trial modular barriers ahead of storm season.</p>
+        <div class="meta">World · 9h ago</div></div>
+    </article>
+
+    <article class="card">
+      <div class="thumb t-tech"></div>
+      <div class="body"><span class="tag tech">Tech</span>
+        <h2>Tiny solar chips promise longer battery life</h2>
+        <p>A research lab reports a leap in low-light efficiency.</p>
+        <div class="meta">Tech · 10h ago</div></div>
+    </article>
+
+  </div>
+</main>
+</body>
+</html>

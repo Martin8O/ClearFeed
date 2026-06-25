@@ -9,12 +9,19 @@
 
 ![ClearFeed demo — distracting articles disappearing from a news feed](assets/demo.gif)
 
+**Before / after** — with *Sports* and *Politics* muted, those articles are hidden automatically as you browse:
+
+![Before and after — a news feed with sports and politics articles hidden by ClearFeed](assets/before-after.png)
+
 ## Features
 
 - **Pick your topics.** Start from one-click **suggested topics** (Politics, Celebrity gossip, Crime & disasters, Money & crypto, Spoilers, Sports) or add your own — each comes with a ready-made keyword list.
 - **Fully editable.** Every topic is just an editable keyword list. A word *stem* is enough: `elect` catches *election*, *elections*, *electoral*…
-- **Multi-language.** Switch the app language and seeded word lists between **English, Español, Deutsch, Français, Čeština and Polski** — so filtering works on your local news too.
+- **Multi-language.** Switch the app language and seeded word lists across **16 languages** (English, Español, Deutsch, Français, Čeština, Polski, Italiano, Português, Nederlands, Русский, Українська, Türkçe, Svenska, Dansk, Norsk, Suomi) — so filtering works on your local news too.
 - **Per-topic on/off** toggles, plus a master switch to pause everything.
+- **Keyboard shortcut** (`Ctrl+Shift+F`, `⌘+Shift+F` on Mac) toggles filtering on/off without opening the popup — rebind it any time from the About panel. The toolbar icon greys out with a red slash while paused, so the state is always visible:
+
+  ![ClearFeed toolbar icon — full colour when filtering is on, greyed with a red slash when off](assets/icon-states.png)
 - **Excluded sites.** Add domains (banking, e-mail, …) where filtering should never run — one click excludes the site you're on.
 - **Reveal hidden items** — one click temporarily shows what was hidden on the page (outlined), then re-hides it, so nothing happens behind your back.
 - **Settings backup** — export your topics and excluded sites to a JSON file and import them on another machine.
@@ -60,7 +67,8 @@ This runs the **safety audit** (`test/safety.test.mjs`, scans shipped code for u
 |------|---------|
 | `manifest.json` | Extension manifest (MV3) |
 | `content.js` | Scans pages and hides matching articles |
+| `background.js` | Service worker — keyboard-shortcut toggle and toolbar-icon state |
 | `presets.js` | Suggested topics + seeded word lists per language |
 | `i18n.js` | UI strings for the in-app language switcher |
 | `popup.html` / `popup.js` | Settings UI (topics, excluded sites, counter) |
-| `icon16/48/128.png` | Toolbar / store icons |
+| `icon16/48/128.png` | Toolbar / store icons (`-off` variants shown while paused) |
