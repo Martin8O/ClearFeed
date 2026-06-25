@@ -1,6 +1,6 @@
 # ClearFeed
 
-![ClearFeed — mute the topics you'd rather not see](assets/banner.png)
+![ClearFeed — mute the topics you'd rather not see](assets/hero.png)
 
 [![CI](https://github.com/Martin8O/ClearFeed/actions/workflows/ci.yml/badge.svg)](https://github.com/Martin8O/ClearFeed/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
