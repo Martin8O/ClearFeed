@@ -15,19 +15,23 @@
 
 ![Before and after — a news feed with sports and politics articles hidden by ClearFeed](assets/before-after.png)
 
-<img src="assets/popup.png" alt="ClearFeed popup — topics with on/off toggles, a hidden-items counter, suggested topics, and a master pause switch" width="220" align="right">
-
-**Your control panel** — the popup is where you pick topics, watch the
-hidden-items counter, pause filtering, switch theme or language, and exclude
-the current site.
-
-- **Your topics** — add, toggle, recolor or edit any topic on the fly.
-- **Suggested topics** — one-click presets to get started fast.
-- **Master switch & counter** — pause everything and see how much is hidden.
-
-<br clear="right">
-
-&nbsp;
+<table>
+  <tr>
+    <td valign="middle">
+      <strong>Your control panel</strong> — the popup is where you pick topics,
+      watch the hidden-items counter, pause filtering, switch theme or language,
+      and exclude the current site.
+      <ul>
+        <li><strong>Your topics</strong> — add, toggle, recolor or edit any topic on the fly.</li>
+        <li><strong>Suggested topics</strong> — one-click presets to get started fast.</li>
+        <li><strong>Master switch &amp; counter</strong> — pause everything and see how much is hidden.</li>
+      </ul>
+    </td>
+    <td width="240" valign="middle">
+      <img src="assets/popup.png" alt="ClearFeed popup — topics with on/off toggles, a hidden-items counter, suggested topics, and a master pause switch" width="220">
+    </td>
+  </tr>
+</table>
 
 ## Features
 
