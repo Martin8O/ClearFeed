@@ -114,3 +114,4 @@ a browser will not populate categories.
 Icons are a filter-funnel mark on an indigo gradient, generated with Python + Pillow
 (supersampled then downscaled with LANCZOS for crisp edges). Re-run the generation script if
 the design changes, and keep all three sizes consistent.
+
