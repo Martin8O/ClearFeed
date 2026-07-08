@@ -92,3 +92,11 @@ This runs the **safety audit** (`test/safety.test.mjs`, scans shipped code for u
 | `i18n.js` | UI strings for the in-app language switcher |
 | `popup.html` / `popup.js` | Settings UI (topics, excluded sites, counter) |
 | `icon16/48/128.png` | Toolbar / store icons (`-off` variants shown while paused) |
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
+---
+
+Built by Martin Svoboda — <https://svobodamartin.dev>
